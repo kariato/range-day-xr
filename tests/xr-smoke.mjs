@@ -9,7 +9,7 @@ const errors = [];
 p.on("pageerror", (e) => errors.push(e.message));
 try {
   await p.goto(
-    (process.env.TEST_URL || "http://localhost:5173/") + "?emulate=quest3",
+    (process.env.TEST_URL || "http://127.0.0.1:5173/") + "?emulate=quest3",
   );
   await p.waitForFunction(() => window.rangeDay);
   await p.locator("#VRButton").waitFor();

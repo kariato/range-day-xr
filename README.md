@@ -1,5 +1,7 @@
 # Range Day XR
 
+The default experience is an 80-metre walk/run course with sequential pop-up targets. Use WASD to walk, Shift to sprint, mouse to aim, and left click to shoot. Targets rise from behind cover when you cross each station, then drop after their time window. Blue targets score; crossed white targets add penalties.
+
 A playable, browser-based WebXR range built with TypeScript, Vite, three.js, Rapier and three-pathfinding. Runs as a static site on GitHub Pages, with desktop mouse/keyboard and immersive VR controller input.
 
 ## Run

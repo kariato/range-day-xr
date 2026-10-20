@@ -12,9 +12,10 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 try {
-  await page.goto(process.env.TEST_URL || "http://localhost:5173/");
+  await page.goto(process.env.TEST_URL || "http://127.0.0.1:5173/");
   await page.waitForFunction(() => window.rangeDay?.state.modelLoaded);
   await page.screenshot({ path: "/private/tmp/range-day-home.png" });
+  await page.locator('[data-range="standard"]').click();
   await page.locator("#play").click();
   await page.waitForFunction(() => window.rangeDay?.state.playing);
   await page.waitForTimeout(200);

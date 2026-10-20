@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --import tsx --test src/game.test.ts",
     "assets": "python3 tools/build_assets.py",
-    "test:browser": "node tests/smoke.mjs"
+    "test:browser": "node tests/smoke.mjs",
+    "test:course": "node tests/course.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.19.0",

@@ -765,3 +765,32 @@ th {
     margin-top: 8px;
   }
 }
+
+.course-guide {
+  position: absolute;
+  bottom: 105px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #15251cdf;
+  border: 1px solid #daef6b66;
+  color: #daef6b;
+  padding: 12px 20px;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-align: center;
+  max-width: 90%;
+  white-space: nowrap;
+}
+@media (max-width: 650px) {
+  .course-guide {
+    white-space: normal;
+    width: 90%;
+    font-size: 10px;
+    bottom: 130px;
+  }
+}
+.hud-bottom > div:first-child {
+  background: #112018de;
+  padding: 12px 18px;
+  border-left: 2px solid var(--lime);
+}
