@@ -77,3 +77,7 @@ Real Quest testing is required for hand alignment, comfort, room-scale boundary 
 `npm run test:qualification` verifies walking beyond the original booth, a full keyboard 360-degree turn, six-room circuit navigation, sideways targets, wall collisions, spatial triggers, and returning to the timed finish. Set `TEST_URL` to the dev server or public URL.
 
 `npm run test:weapons` browser-checks all three GLBs and Armory previews, chambered capacities, semi-auto triggers, recoil movement, loadout persistence and magazine/tube reloads. The unit suite additionally checks frame-rate-independent recoil, pump cycling and empty/tactical chamber behavior.
+
+Successful shots play embedded `FireCycle` GLB animations: pistol slide, rifle bolt, and shotgun pump/bolt. A brief layered muzzle flash follows the muzzle marker. Spent brass or red shotgun hulls eject, tumble, bounce against range surfaces, and disappear after 4.5 seconds of active play; the pool is capped at 36 casings. Shotgun ejection occurs during the pump stroke. Empty semi-auto weapons remain visibly open until charged. Effects follow the weapon in desktop and VR views.
+
+`npm run test:firing` checks the embedded clips, visible cycles/flashes, one moving casing per shot, delayed shotgun extraction, and cleanup in Chromium. `npm run assets:weapon-animations` embeds the clips after a model export without needing Blender.

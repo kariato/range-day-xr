@@ -1,3 +1,4 @@
+import { WeaponEffects } from "./weapons/effects";
 import { WeaponModels } from "./weapons/models";
 import { RecoilSpring } from "./weapons/recoil";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -60,8 +61,7 @@ let distance = 15,
   warehouseMode = "survival",
   activated = new Set<number>(),
   course: any;
-let flashUntil = 0,
-  reloadUntil = 0,
+let reloadUntil = 0,
   toastUntil = 0,
   hitUntil = 0,
   damageUntil = 0,
@@ -115,17 +115,10 @@ const weaponModels = new WeaponModels(),
 let muzzleNode: T.Object3D | undefined;
 let gunBody = new T.Group(),
   weaponParts: Record<string, T.Object3D | undefined> = {};
-const flash = new T.Mesh(
-  new T.ConeGeometry(0.018, 0.065, 8),
-  new T.MeshBasicMaterial({
-    color: 0xffdc99,
-    transparent: true,
-    opacity: 0.9,
-    depthWrite: false,
-  }),
+const weaponEffects = new WeaponEffects((origin, direction, distance) =>
+  world.traceSurface(origin, direction, distance),
 );
-flash.rotation.x = -Math.PI / 2;
-flash.visible = false;
+scene.add(weaponEffects.root);
 function makeGun() {
   gun.clear();
   gunBody = new T.Group();
@@ -134,15 +127,14 @@ function makeGun() {
   weaponParts = {};
   for (const name of ["Slide", "Magazine", "Pump", "Bolt"])
     weaponParts[name] = model.getObjectByName(name);
-  const muzzle = WEAPONS[weapon.index].muzzle;
   muzzleNode = model.getObjectByName("Muzzle");
-  model.updateMatrixWorld(true);
-  if (muzzleNode)
-    flash.position.copy(muzzleNode.getWorldPosition(new T.Vector3()));
-  else flash.position.set(muzzle[0], muzzle[1], muzzle[2]);
-  flash.position.z -= 0.025;
-  flash.visible = false;
-  gunBody.add(flash);
+  weaponEffects.bind(
+    gunBody,
+    weapon.index,
+    weaponParts,
+    muzzleNode,
+    weaponModels.cycleClip(weapon.index),
+  );
   gun.add(gunBody);
   recoilSpring.reset();
   attachGun();
@@ -633,6 +625,7 @@ async function start(id: RangeId, flat = true) {
   selected = id;
   playing = false;
   clearDynamics();
+  weaponEffects.resetRun();
   try {
     if (id === "runthrough") {
       const response = await fetch(
@@ -905,8 +898,7 @@ function fire() {
   shots++;
   splits.push(elapsed);
   recoilSpring.shot(weapon.index);
-  flash.visible = true;
-  flashUntil = time + 0.055;
+  weaponEffects.shot();
   haptic(WEAPONS[weapon.index].haptic);
   tone(WEAPONS[weapon.index].soundFrequency, 0.12, 0.11, "sawtooth");
   aimRay();
@@ -1170,6 +1162,7 @@ async function hub() {
   vrMenu.visible = false;
   gun.visible = false;
   clearDynamics();
+  weaponEffects.resetRun();
   await coursePreview();
   flashlight.visible = false;
   if (renderer.xr.isPresenting) openVrMenu();
@@ -1655,19 +1648,7 @@ function frame(now: number) {
   if (!paused) recoilSpring.update(dt, weapon.index);
   gunBody.rotation.set(recoilSpring.pitch, recoilSpring.yaw, 0);
   gunBody.position.z = recoilSpring.back;
-  const config = WEAPONS[weapon.index],
-    sinceShot = elapsed - weapon.lastShot;
-  if (weaponParts.Slide)
-    weaponParts.Slide.position.z = !weapon.chambered
-      ? 0.025
-      : Math.max(0, 1 - sinceShot / config.cycleSeconds) * 0.025;
-  if (weaponParts.Bolt)
-    weaponParts.Bolt.position.z =
-      Math.max(0, 1 - sinceShot / config.cycleSeconds) * 0.03;
-  if (weaponParts.Pump) {
-    const progress = T.MathUtils.clamp(sinceShot / config.cycleSeconds, 0, 1);
-    weaponParts.Pump.position.z = Math.sin(progress * Math.PI) * 0.065;
-  }
+  const config = WEAPONS[weapon.index];
   if (weaponParts.Magazine) {
     const out = weapon.state === "mag-out";
     weaponParts.Magazine.visible = !out;
@@ -1686,7 +1667,10 @@ function frame(now: number) {
     } else weaponParts.Magazine.position.y = 0;
   }
 
-  if (time > flashUntil) flash.visible = false;
+  weaponEffects.update(
+    playing && !paused && !finished ? dt : 0,
+    weapon.chambered,
+  );
   if (time > toastUntil) $("#toast").textContent = "";
   if (time > hitUntil) $("#hitmark").style.opacity = "0";
   $("#damage").style.opacity = time < damageUntil ? ".8" : "0";
@@ -2060,6 +2044,8 @@ async function init() {
           weaponIndex: weapon.index,
           weaponId: WEAPONS[weapon.index].id,
           weaponModelsLoaded: weaponModels.loaded,
+          weaponAnimationClips: weaponModels.embeddedCycles,
+          firingEffects: weaponEffects.state,
           recoilPitch: recoilSpring.pitch,
           recoilBack: recoilSpring.back,
           reloadState: weapon.state,

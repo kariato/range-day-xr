@@ -130,6 +130,20 @@ export class World {
     if (group == null) return [];
     return this.path.findPath(a, b, "warehouse", group) || [];
   }
+  traceSurface(origin: T.Vector3, direction: T.Vector3, distance: number) {
+    if (!this.physics) return null;
+    const hit = this.physics.castRayAndGetNormal(
+      new RAPIER.Ray(origin, direction),
+      distance,
+      true,
+    );
+    return hit
+      ? {
+          distance: hit.timeOfImpact,
+          normal: new T.Vector3(hit.normal.x, hit.normal.y, hit.normal.z),
+        }
+      : null;
+  }
   occluded(origin: T.Vector3, direction: T.Vector3, distance: number) {
     return !!this.physics.castRay(
       new RAPIER.Ray(origin, direction),

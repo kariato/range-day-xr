@@ -37,3 +37,7 @@ Manufacturer sources:
 - [Mossberg 590R specifications](https://resources.mossberg.com/journal/590r-590rm-shotguns-rotary-safety-selector): SKU 50762 lists 6+1, 12 gauge, 18.5-inch barrel and adjustable stock.
 
 Capacities/calibers are sourced facts. Recoil, spread, cadence limits, reload times, eight-pellet shotgun pattern and haptics are game balancing values, not measured real-world ballistics. Empty-mag reloads feed a chamber round from the inserted magazine; tactical reloads retain the chambered round. Switching weapons preserves each weapon's ammunition and reload state. Pump cycling blocks firing until complete, and tube reloads insert one shell at a time.
+
+## Firing animation
+
+The export command runs `tools/animate-weapons.ts` after Blender export, embedding a `FireCycle` animation into each GLB. These keyframe clips animate the named movable exterior groups; the editable Blender source files retain their original static modeling setup. The runtime uses Three.js AnimationMixer to play the clips and adds muzzle-marker flashes and pooled, caliber-specific spent cases. Shotgun extraction is delayed until the pump stroke. To refresh only the embedded clips, run `npm run assets:weapon-animations`.

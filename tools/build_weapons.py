@@ -12,3 +12,5 @@ if '--generate' in sys.argv:
 else:
     for source in sorted((root/'assets/weapons').glob('*.blend')):
         subprocess.run([blender,'--background',str(source),'--python',str(root/'tools/export_weapon.py'),'--',str(root/'public/models/weapons'/f'{source.stem}.glb')],cwd=root,check=True)
+
+subprocess.run(["node","--import","tsx",str(root/"tools/animate-weapons.ts")],cwd=root,check=True)
