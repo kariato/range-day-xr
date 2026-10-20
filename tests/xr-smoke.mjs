@@ -1,2 +1,25 @@
-import {chromium} from '@playwright/test';import assert from 'node:assert/strict';
-const b=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1440,height:1000}});const errors=[];p.on('pageerror',e=>errors.push(e.message));try{await p.goto('http://localhost:5174/?emulate=quest3');await p.waitForFunction(()=>window.rangeDay);await p.locator('#VRButton').waitFor();console.log('XR button:',await p.locator('#VRButton').innerText());await p.locator('#VRButton').click();await p.waitForTimeout(1200);console.log('after click:',await p.locator('#VRButton').innerText());assert.match(await p.locator('#VRButton').innerText(),/EXIT VR/);assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: IWER Quest 3 immersive session starts.');}finally{await b.close();}
+import { chromium } from "@playwright/test";
+import assert from "node:assert/strict";
+const b = await chromium.launch({
+  headless: true,
+  args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+});
+const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
+const errors = [];
+p.on("pageerror", (e) => errors.push(e.message));
+try {
+  await p.goto(
+    (process.env.TEST_URL || "http://localhost:5173/") + "?emulate=quest3",
+  );
+  await p.waitForFunction(() => window.rangeDay);
+  await p.locator("#VRButton").waitFor();
+  console.log("XR button:", await p.locator("#VRButton").innerText());
+  await p.locator("#VRButton").click();
+  await p.waitForTimeout(1200);
+  console.log("after click:", await p.locator("#VRButton").innerText());
+  assert.match(await p.locator("#VRButton").innerText(), /EXIT VR/);
+  assert.equal(errors.length, 0, errors.join("\n"));
+  console.log("PASS: IWER Quest 3 immersive session starts.");
+} finally {
+  await b.close();
+}

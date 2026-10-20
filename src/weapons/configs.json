@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Training pistol",
+    "short": "P15",
+    "capacity": 15,
+    "interval": 0.2,
+    "spread": 0.0015,
+    "damage": 1,
+    "auto": false,
+    "kick": 0.075
+  },
+  {
+    "name": "Carbine",
+    "short": "C30",
+    "capacity": 30,
+    "interval": 0.0857142857,
+    "spread": 0.003,
+    "damage": 1,
+    "auto": true,
+    "kick": 0.045
+  },
+  {
+    "name": "Pump shotgun",
+    "short": "S6",
+    "capacity": 6,
+    "interval": 0.8,
+    "spread": 0.035,
+    "damage": 1,
+    "auto": false,
+    "kick": 0.13
+  }
+]

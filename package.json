@@ -23,6 +23,7 @@
     "@types/three": "^0.180.0",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "iwer": "^2.1.0",
+    "prettier": "^3.9.10",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
     "vite": "^7.1.0"

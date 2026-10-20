@@ -1,1 +1,48 @@
-{"name":"Cover Drill","night":false,"stations":[{"z":-7,"targets":[[-4,-15,false],[3,-17,false],[0,-19,true]]},{"z":-20,"targets":[[-3,-28,false],[4,-30,true],[1,-32,false]]},{"z":-34,"targets":[[-4,-42,false],[2,-45,false],[4,-43,true]]},{"z":-48,"targets":[[-3,-56,false],[3,-60,false],[0,-58,false]]},{"z":-63,"targets":[[-4,-73,true],[0,-76,false],[4,-74,false]]}],"upTime":3,"finish":-79}
+{
+  "name": "Cover Drill",
+  "night": false,
+  "stations": [
+    {
+      "z": -7,
+      "targets": [
+        [-4, -15, false],
+        [3, -17, false],
+        [0, -19, true]
+      ]
+    },
+    {
+      "z": -20,
+      "targets": [
+        [-3, -28, false, "mover"],
+        [4, -30, true],
+        [1, -32, false]
+      ]
+    },
+    {
+      "z": -34,
+      "targets": [
+        [-4, -42, false],
+        [2, -45, false],
+        [4, -43, true]
+      ]
+    },
+    {
+      "z": -48,
+      "targets": [
+        [-3, -56, false, "activator"],
+        [3, -60, false, "swinger"],
+        [0, -58, false]
+      ]
+    },
+    {
+      "z": -63,
+      "targets": [
+        [-4, -73, true],
+        [0, -76, false],
+        [4, -74, false]
+      ]
+    }
+  ],
+  "upTime": 3,
+  "finish": -79
+}

@@ -16,8 +16,8 @@ For a Quest on the same network: `HTTPS=1 npm run dev`, open the printed LAN URL
 
 ## Playable features
 
-- Standard range: 10 lanes, paper bullseyes, zone targets and falling steel, distances 5–50m, bring-back inspection, persistent bullet marks, free fire, 5-shot group, 6-shot string and randomized reaction drills. Exact smallest enclosing circle for group diameter.
-- Run-through: three JSON-driven five-station courses, timed blue/white pop-ups, hit zones, no-shoot and miss penalties, hit factor, saved Basic Lane ghost, and a flashlight for Night Run. Walk across the finish gate to end a run.
+- Standard range: 10 lanes, paper bullseyes, zone targets and falling steel, distances 5–50m, bring-back inspection, up to 48 persistent bullet marks, free fire, 5-shot group, 6-shot string and randomized reaction drills. Exact smallest enclosing circle for group diameter.
+- Run-through: three JSON-driven five-station courses, timed blue/white pop-ups, moving targets and steel-activated swingers in Cover Drill, hit zones, no-shoot and miss penalties, hit factor, saved Basic Lane ghost, and a flashlight for Night Run. Walk across the finish gate to end a run.
 - Warehouse: navmesh pursuit around racks, walkers, rushers, shooters with visible foam projectiles, frontal shield blocking, 12-enemy cap, 10Hz path updates, health regeneration, endless waves/resupply, fixed building clear and sandbox modes.
 - Shared pistol, automatic carbine, shotgun pellet spread, recoil, haptics, reload state machine with magazine reserves, synth audio, local records/medals and settings.
 - WebXR: controller models, handedness, two-handed aiming, support-stick locomotion or teleport, 30-degree snap or smooth turning, wrist stats, menu pointing, manual magazine grip/slide interaction or simple reload.
@@ -35,7 +35,7 @@ For a Quest on the same network: `HTTPS=1 npm run dev`, open the printed LAN URL
 | Reload | R | Gun A/X |
 | Weapons | 1–3 or wheel | Gun B/Y |
 | Pause / menu | Esc | Support B/Y |
-| Finish free-fire string | Enter | Use desktop results; VR menu allows range restart |
+| Finish free-fire string | Enter | Wrist menu → Finish string |
 | Debug / free camera | F1 / F2 | Desktop only |
 
 With simple reload disabled: press R to eject, R to insert, R to charge. In VR eject with A/X, hold support grip at belt height, move the magazine to the weapon, then release/regrip at the slide and pull back. A/X also steps the manual sequence as an accessibility fallback.
@@ -54,7 +54,7 @@ Click the scene if the browser releases pointer lock. Esc releases the mouse and
 
 ## Current limits versus the complete design
 
-This is an early-access implementation, not the final six-milestone art/performance release. Environments and weapons are geometric blockouts, not authored Blender scenes with baked lighting, rigged dummy animations or compressed texture art. Audio is synthesized rather than positional asset recordings. The warehouse uses a single level of racks/dock cover; office, stairs and catwalk remain for the environment pass. Steel uses visual fall/reset rather than rigid-body plate simulation. Shotgun uses a simplified full reload. Rail retrieval snaps to inspection distance. Course movers, activator swingers, attachments, the guided tutorial, 3D hub-door transitions, physical in-world range-control panels, rigged hit/down animations and VR result boards remain. The desktop result modal and range selectors have not yet been reproduced as world panels. Settings/records are local to the browser. No multiplayer, passthrough or online leaderboard.
+This is an early-access implementation, not the final six-milestone art/performance release. Environments and weapons are geometric blockouts, not authored Blender scenes with baked lighting, rigged dummy animations or compressed texture art. Audio is synthesized rather than positional asset recordings. The warehouse uses a single level of racks/dock cover; office, stairs and catwalk remain for the environment pass. Steel uses visual fall/reset rather than rigid-body plate simulation. Rail retrieval snaps to inspection distance. Attachments, the guided tutorial, 3D hub-door transitions, physical in-world range-control panels, rigged hit/down animations remain. VR includes a world-space range control menu and result summary; its layout still needs headset usability testing. Settings/records are local to the browser. No multiplayer, passthrough or online leaderboard.
 
 Real Quest testing is required for hand alignment, comfort, room-scale boundary behavior and sustained 72Hz performance. Software-browser draw-call checks are not headset certification. Controller models load from the three.js controller asset service; font files load from Google Fonts with local fallbacks.
 
