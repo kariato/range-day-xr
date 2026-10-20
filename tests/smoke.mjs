@@ -34,7 +34,7 @@ try {
   await page.screenshot({ path: "/private/tmp/range-day-standard.png" });
   await page.keyboard.press("Enter");
   await page.locator("#hub").click();
-  await page.locator('[data-range="runthrough"]').click();
+  await page.locator('[data-range="runthrough"][data-course="basic"]').click();
   await page.locator("#play").click();
   await page.waitForFunction(
     () =>

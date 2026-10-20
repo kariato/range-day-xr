@@ -794,3 +794,55 @@ th {
   padding: 12px 18px;
   border-left: 2px solid var(--lime);
 }
+.cards {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1260px;
+}
+.card h2 {
+  font-size: 22px;
+}
+.look-hint {
+  position: absolute;
+  top: 175px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #102018df;
+  color: #daef6b;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 10px 16px;
+  max-width: 90%;
+}
+@media (max-width: 1000px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .card {
+    min-height: 120px;
+  }
+  .card h2 {
+    margin-top: 8px;
+  }
+  .range-title {
+    margin-top: 15px;
+  }
+  .hero-meta {
+    display: none;
+  }
+}
+@media (max-width: 500px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    min-height: 85px;
+  }
+  .launch-row {
+    flex-wrap: wrap;
+  }
+  .look-hint {
+    top: 210px;
+    width: 90%;
+  }
+}

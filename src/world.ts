@@ -7,6 +7,7 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { Pathfinding } from "three-pathfinding";
 export class World {
   root = new T.Group();
+  bounds: T.Box3 | null = null;
   physics!: RAPIER.World;
   path = new Pathfinding();
   hasNav = false;
@@ -34,6 +35,7 @@ export class World {
     this.physics = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
     this.root.clear();
     this.colliders = [];
+    this.bounds = null;
     this.spawns = [];
     this.hasNav = false;
     let model = this.cache.get(id);
@@ -63,6 +65,7 @@ export class World {
         const bounds = new T.Box3().setFromObject(o),
           size = bounds.getSize(new T.Vector3()),
           p = bounds.getCenter(new T.Vector3());
+        if (/^COL_(floor|ground)/.test(o.name)) this.bounds = bounds.clone();
         this.physics.createCollider(
           RAPIER.ColliderDesc.cuboid(
             size.x / 2,
@@ -94,6 +97,14 @@ export class World {
     }
   }
   blocked(x: number, z: number) {
+    if (
+      this.bounds &&
+      (x < this.bounds.min.x + 0.3 ||
+        x > this.bounds.max.x - 0.3 ||
+        z < this.bounds.min.z + 0.3 ||
+        z > this.bounds.max.z - 0.3)
+    )
+      return true;
     for (const m of this.colliders) {
       const box = new T.Box3().setFromObject(m);
       if (box.max.y < 0.35 || box.min.y > 1.7) continue;

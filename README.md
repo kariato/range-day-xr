@@ -1,5 +1,9 @@
 # Range Day XR
 
+Every range supports free walking, strafing, sprinting, and unrestricted 360-degree horizontal turning. The precision range now has walkable openings beside the benches and a shared rear walkway. World walls and floor boundaries still collide. Mouse capture provides continuous looking; right-drag, Q/E or arrow keys provide turning when an embedded browser blocks pointer lock. Shift works on either side of the keyboard; Quest support-stick click sprints.
+
+**Qualification House** is a new original timed CQB training range inspired by classic military-game opening training sequences. Select card 04 or the course selector. Clear six connected rooms around a loop, take left/right turns, turn back toward the entrance, distinguish blue/white pop-ups and reach the return finish gate. Targets face different directions, rooms use spatial triggers, and a relative direction/distance guide points to the next room. Missed/no-shoot penalties apply. No maps, branding or assets from Call of Duty are included.
+
 The default experience is an 80-metre walk/run course with sequential pop-up targets. Use WASD to walk, Shift to sprint, mouse to aim, and left click to shoot. Targets rise from behind cover when you cross each station, then drop after their time window. Blue targets score; crossed white targets add penalties.
 
 A playable, browser-based WebXR range built with TypeScript, Vite, three.js, Rapier and three-pathfinding. Runs as a static site on GitHub Pages, with desktop mouse/keyboard and immersive VR controller input.
@@ -19,7 +23,7 @@ For a Quest on the same network: `HTTPS=1 npm run dev`, open the printed LAN URL
 ## Playable features
 
 - Standard range: 10 lanes, paper bullseyes, zone targets and falling steel, distances 5–50m, bring-back inspection, up to 48 persistent bullet marks, free fire, 5-shot group, 6-shot string and randomized reaction drills. Exact smallest enclosing circle for group diameter.
-- Run-through: three JSON-driven five-station courses, timed blue/white pop-ups, moving targets and steel-activated swingers in Cover Drill, hit zones, no-shoot and miss penalties, hit factor, saved Basic Lane ghost, and a flashlight for Night Run. Walk across the finish gate to end a run.
+- Run-through: three outdoor JSON-driven five-station courses plus the six-room Qualification House, timed blue/white pop-ups, moving targets and steel-activated swingers in Cover Drill, hit zones, no-shoot and miss penalties, hit factor, saved Basic Lane ghost, and a flashlight for Night Run. Walk across the finish gate to end a run.
 - Warehouse: navmesh pursuit around racks, walkers, rushers, shooters with visible foam projectiles, frontal shield blocking, 12-enemy cap, 10Hz path updates, health regeneration, endless waves/resupply, fixed building clear and sandbox modes.
 - Shared pistol, automatic carbine, shotgun pellet spread, recoil, haptics, reload state machine with magazine reserves, synth audio, local records/medals and settings.
 - WebXR: controller models, handedness, two-handed aiming, support-stick locomotion or teleport, 30-degree snap or smooth turning, wrist stats, menu pointing, manual magazine grip/slide interaction or simple reload.
@@ -30,9 +34,9 @@ For a Quest on the same network: `HTTPS=1 npm run dev`, open the printed LAN URL
 
 | Action | Desktop | Quest |
 |---|---|---|
-| Aim / fire | Mouse / left click | Gun controller / trigger |
+| Aim / fire | Mouse (right-drag fallback) / left click | Gun controller / trigger |
 | Move | WASD | Support thumbstick |
-| Turn | Mouse | Gun thumbstick |
+| Turn | Mouse, Q/E or arrow keys | Gun thumbstick |
 | Sprint / crouch | Shift / C | Physical crouch |
 | Reload | R | Gun A/X |
 | Weapons | 1–3 or wheel | Gun B/Y |
@@ -63,3 +67,5 @@ Real Quest testing is required for hand alignment, comfort, room-scale boundary 
 ## GitHub Pages
 
 `.github/workflows/pages.yml` builds/tests on pushes to `main`, then uploads/deploys `dist`. In repository Settings → Pages use **GitHub Actions**. Vite uses a relative base so both project URLs and custom domains work. Repository visibility must permit Pages on your account plan.
+
+`npm run test:qualification` verifies walking beyond the original booth, a full keyboard 360-degree turn, six-room circuit navigation, sideways targets, wall collisions, spatial triggers, and returning to the timed finish. Set `TEST_URL` to the dev server or public URL.

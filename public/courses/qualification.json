@@ -1,0 +1,77 @@
+{
+  "name": "Qualification House",
+  "scene": "qualification",
+  "night": false,
+  "indoors": true,
+  "upTime": 6,
+  "start": [0, 3],
+  "stations": [
+    {
+      "x": 0,
+      "z": -6.5,
+      "radius": 2,
+      "label": "ENTRY ROOM",
+      "targets": [
+        [-2, -12, false, null, 0],
+        [3, -11, false, null, 0],
+        [-3, -10, true, null, 0]
+      ]
+    },
+    {
+      "x": 10,
+      "z": -9,
+      "radius": 2.4,
+      "label": "RIGHT ROOM",
+      "targets": [
+        [15, -11, false, null, -1.570796],
+        [14, -6, false, null, -1.570796],
+        [15, -8, true, null, -1.570796]
+      ]
+    },
+    {
+      "x": 10,
+      "z": -21,
+      "radius": 2.4,
+      "label": "REAR RIGHT",
+      "targets": [
+        [13, -26, false, null, 0],
+        [8, -25, true, null, 0],
+        [6, -23, false, null, 1.570796]
+      ]
+    },
+    {
+      "x": 0,
+      "z": -21,
+      "radius": 2.4,
+      "label": "CROSS ROOM",
+      "targets": [
+        [1, -26, false, null, 0],
+        [-2, -25, false, null, 0],
+        [2, -18, true, null, 3.141593]
+      ]
+    },
+    {
+      "x": -10,
+      "z": -21,
+      "radius": 2.4,
+      "label": "REAR LEFT",
+      "targets": [
+        [-15, -24, false, null, 1.570796],
+        [-14, -18, false, null, 1.570796],
+        [-9, -26, true, null, 0]
+      ]
+    },
+    {
+      "x": -10,
+      "z": -9,
+      "radius": 2.4,
+      "label": "RETURN ROOM",
+      "targets": [
+        [-12, -4, false, null, 3.141593],
+        [-8, -5, false, null, 3.141593],
+        [-15, -8, true, null, 1.570796]
+      ]
+    }
+  ],
+  "finish": { "x": -10, "z": 3, "radius": 2 }
+}

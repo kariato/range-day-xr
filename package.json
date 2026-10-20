@@ -7,10 +7,11 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --import tsx --test src/game.test.ts",
+    "test": "node --import tsx --test src/*.test.ts",
     "assets": "python3 tools/build_assets.py",
     "test:browser": "node tests/smoke.mjs",
-    "test:course": "node tests/course.mjs"
+    "test:course": "node tests/course.mjs",
+    "test:qualification": "node tests/qualification.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.19.0",

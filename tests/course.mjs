@@ -12,7 +12,7 @@ try {
   await page.waitForFunction(() => window.rangeDay?.state.modelLoaded);
   assert(
     await page
-      .locator('[data-range="runthrough"]')
+      .locator('[data-range="runthrough"][data-course="basic"]')
       .evaluate((el) => el.classList.contains("selected")),
   );
   await page.locator("#play").click();

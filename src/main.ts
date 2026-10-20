@@ -1,3 +1,4 @@
+import { stationReached, finishReached, waypoint } from "./course";
 import "./style.css";
 import * as T from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
@@ -19,7 +20,7 @@ const $ = <E extends HTMLElement = HTMLElement>(s: string) =>
   document.querySelector<E>(s)!;
 const app = $("#app");
 const cross = `<svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="13" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="20" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M20 0v11m0 18v11M0 20h11m18 0h11" stroke="currentColor" stroke-width="1.6"/></svg>`;
-app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Walk or sprint through an 80-metre outdoor course.<br>Cross each station. React to pop-up targets. Beat your time.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 03</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--lime)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">15</b> <span>/ <span id="capacity">15</span></span></div><div class="weapon-label" id="weapon-label">P15 · TRAINING PISTOL</div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
+app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Explore every range with full 360° movement and looking.<br>Run the outdoor course or clear the new Qualification House.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 04</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough" data-course="basic"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button><button class="card" data-range="runthrough" data-course="qualification"><span class="num">04</span><span class="tag">NEW · 360° CQB</span><h2>QUALIFICATION HOUSE</h2><p>Clear six rooms. Turn every corner. Race the clock.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--lime)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="look-hint" id="look-hint">MOUSE: LOOK 360° · CLICK TO CAPTURE · RIGHT-DRAG OR Q/E TO TURN</div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">15</b> <span>/ <span id="capacity">15</span></span></div><div class="weapon-label" id="weapon-label">P15 · TRAINING PISTOL</div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>Q / E</kbd> TURN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
 const save = loadSave(),
   world = new World();
 let resultsSummary = "";
@@ -220,6 +221,7 @@ function buildVrMenu() {
   const choices: [string, string][] = [
     ["01 STANDARD", "range-standard"],
     ["02 RUN-THROUGH", "range-runthrough"],
+    ["04 QUALIFICATION HOUSE", "qualification"],
     ["03 WAREHOUSE", "range-warehouse"],
     [finished ? "RETRY SESSION" : playing ? "RESUME" : "START RANGE", "resume"],
     ["RELOAD", "reload"],
@@ -385,9 +387,11 @@ function addTarget(
   z: number,
   no = false,
   station = -1,
+  yaw = 0,
 ) {
   const group = new T.Group();
   group.position.set(x, y, z);
+  group.rotation.y = yaw;
   const steel = type === "steel";
   const face = new T.Mesh(
     steel ? new T.CircleGeometry(0.3, 24) : new T.PlaneGeometry(1.1, 1.1),
@@ -427,7 +431,8 @@ function addTarget(
   if (station >= 0) {
     group.visible = false;
     const cover = box(1.45, 0.85, 0.25, 0x947d51);
-    cover.position.set(x, 0.425, z + 0.3);
+    cover.position.set(x + Math.sin(yaw) * 0.3, 0.425, z + Math.cos(yaw) * 0.3);
+    cover.rotation.y = yaw;
     dynamics.add(cover);
   }
   return target;
@@ -458,7 +463,7 @@ function modalHead(title: string) {
 }
 function howTo() {
   showModal(
-    `${modalHead("Welcome to the range")}<p>Click <b>Enter the range</b> to capture your mouse. Aim with the mouse and click to fire. Press <b>Esc</b> to pause and release the mouse.</p><table><tr><td>Move / Sprint / Crouch</td><td>W A S D / Shift / C</td></tr><tr><td>Reload / Change weapon</td><td>R / 1–3 or mouse wheel</td></tr><tr><td>Manual reload (simple reload off)</td><td>R eject → R insert → R charge</td></tr><tr><td>Finish a free-fire string</td><td>Enter</td></tr><tr><td>Debug / Free camera</td><td>F1 / F2 (Space up, C down)</td></tr></table><p><b>Quest:</b> Enter VR, point at a menu button and pull the trigger. Gun-hand trigger fires, A/X reloads, B/Y changes weapons, support stick moves, gun stick turns. Squeeze both grips for a stable two-hand hold. Support Y/B opens the wrist menu. Full reload: eject with A/X, grip near your belt to take a magazine, bring it to the gun, then grip near the slide and pull back.</p><p>Blue course targets are shoot targets. White crossed targets add 10 seconds. Course misses add 5 seconds. All three ranges are open in this early-access build.</p>`,
+    `${modalHead("Welcome to the range")}<p>Click <b>Enter the range</b> to capture your mouse. Aim with the mouse and click to fire. Press <b>Esc</b> to pause and release the mouse.</p><table><tr><td>Move / Sprint / Crouch</td><td>W A S D / Shift / C</td></tr><tr><td>Look / turn 360°</td><td>Mouse or right-drag; Q/E or arrow keys</td></tr><tr><td>Reload / Change weapon</td><td>R / 1–3 or mouse wheel</td></tr><tr><td>Manual reload (simple reload off)</td><td>R eject → R insert → R charge</td></tr><tr><td>Finish a free-fire string</td><td>Enter</td></tr><tr><td>Debug / Free camera</td><td>F1 / F2 (Space up, C down)</td></tr></table><p><b>Quest:</b> Enter VR, point at a menu button and pull the trigger. Gun-hand trigger fires, A/X reloads, B/Y changes weapons, support stick moves, gun stick turns. Squeeze both grips for a stable two-hand hold. Support Y/B opens the wrist menu. Full reload: eject with A/X, grip near your belt to take a magazine, bring it to the gun, then grip near the slide and pull back.</p><p>Blue course targets are shoot targets. White crossed targets add 10 seconds. Course misses add 5 seconds. All three ranges are open in this early-access build.</p>`,
   );
 }
 function settings() {
@@ -510,7 +515,7 @@ function updateControls() {
   if (range === "standard")
     el.innerHTML = `${[5, 10, 15, 25, 50].map((d) => `<button data-distance="${d}" class="${distance === d ? "active" : ""}">${d}m</button>`).join("")}<button id="bring">BRING BACK</button><select aria-label="Target type" id="target-select"><option value="paper">Bullseye paper</option><option value="steel">Steel plates</option><option value="zone">A / C / D zones</option></select><select aria-label="Drill" id="drill-select"><option value="free">Free fire</option><option value="group">5-shot group</option><option value="timed">6-shot timed string</option><option value="reaction">Reaction drill</option></select><button id="reset-targets">RESET</button><button id="finish-string">FINISH STRING</button>`;
   else if (range === "runthrough")
-    el.innerHTML = `<select aria-label="Course" id="course-select"><option value="basic">Basic Lane</option><option value="cover">Cover Drill</option><option value="night">Night Run</option></select><button id="restart">RESTART</button>`;
+    el.innerHTML = `<select aria-label="Course" id="course-select"><option value="basic">Basic Lane</option><option value="cover">Cover Drill</option><option value="night">Night Run</option><option value="qualification">Qualification House · 360° CQB</option></select><button id="restart">RESTART</button>`;
   else
     el.innerHTML = `<select aria-label="Warehouse mode" id="mode-select"><option value="survival">Survival</option><option value="clear">Clear the building</option><option value="sandbox">Sandbox</option></select><button id="restart">RESTART</button>${warehouseMode === "sandbox" ? '<button id="spawn-dummy">SPAWN DUMMY</button><button id="attacks">ATTACKS: OFF</button>' : ""}`;
 }
@@ -550,8 +555,23 @@ async function start(id: RangeId, flat = true) {
   playing = false;
   clearDynamics();
   try {
-    await world.load(id);
-    rig.position.set(0, 0, id === "warehouse" ? 3 : 3);
+    if (id === "runthrough") {
+      const response = await fetch(
+        `${import.meta.env.BASE_URL}courses/${courseName}.json`,
+      );
+      if (!response.ok) throw new Error("Course file could not load");
+      course = await response.json();
+    }
+    await world.load(id === "runthrough" ? (course.scene ?? "runthrough") : id);
+    rig.position.set(
+      id === "runthrough" ? (course.start?.[0] ?? 0) : 0,
+      0,
+      id === "standard"
+        ? 5.5
+        : id === "runthrough"
+          ? (course.start?.[1] ?? 3)
+          : 3,
+    );
     camera.position.set(0, save.settings.seated ? 2.05 : 1.65, 0);
     camera.rotation.set(0, 0, 0);
     rig.rotation.set(0, 0, 0);
@@ -584,13 +604,8 @@ async function start(id: RangeId, flat = true) {
       sign.position.set(0, 3.7, -6);
       dynamics.add(sign);
     } else if (id === "runthrough") {
-      const response = await fetch(
-        `${import.meta.env.BASE_URL}courses/${courseName}.json`,
-      );
-      if (!response.ok) throw new Error("Course file could not load");
-      course = await response.json();
       for (const [i, s] of course.stations.entries())
-        for (const [x, z, no, motion] of s.targets) {
+        for (const [x, z, no, motion, yaw] of s.targets) {
           const t = addTarget(
             motion === "activator" ? "steel" : "popup",
             x,
@@ -598,16 +613,35 @@ async function start(id: RangeId, flat = true) {
             z,
             no,
             i,
+            yaw ?? 0,
           );
           t.motion = motion;
         }
       for (const [i, s] of course.stations.entries()) {
-        const sign = textBoard(`STATION 0${i + 1}`, 2, 0.4);
-        sign.position.set(-5, 2, s.z);
+        const sign = textBoard(s.label ?? `STATION 0${i + 1}`, 2, 0.4);
+        sign.position.set((s.x ?? 0) - 2.5, 2.8, s.z);
+        const ring = new T.Mesh(
+          new T.RingGeometry(s.radius ?? 1.2, (s.radius ?? 1.2) + 0.07, 32),
+          new T.MeshBasicMaterial({ color: 0xdaef6b, side: T.DoubleSide }),
+        );
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(s.x ?? 0, 0.025, s.z);
+        dynamics.add(ring);
         dynamics.add(sign);
       }
       const finish = textBoard("FINISH", 5, 1);
-      finish.position.set(0, 2.5, course.finish);
+      finish.position.set(
+        typeof course.finish === "number" ? 0 : course.finish.x,
+        2.5,
+        typeof course.finish === "number" ? course.finish : course.finish.z,
+      );
+      if (course.indoors) {
+        scene.background = new T.Color("#516057");
+        scene.fog = new T.Fog("#516057", 25, 70);
+        const title = textBoard("QUALIFICATION HOUSE · GO", 3.5, 0.5);
+        title.position.set(0, 2.8, 1);
+        dynamics.add(title);
+      }
       dynamics.add(finish);
       flashlight.visible = course.night;
       sun.intensity = course.night ? 0.05 : 2.8;
@@ -659,6 +693,9 @@ async function start(id: RangeId, flat = true) {
         : id === "runthrough"
           ? "02 / RUN-THROUGH"
           : "03 / WAREHOUSE";
+    if (id === "runthrough")
+      $("#range-label").textContent =
+        `${courseName === "qualification" ? "04" : "02"} / ${course.name.toUpperCase()} · 360° FREE MOVEMENT`;
     playing = true;
     vrMenu.visible = false;
     gun.visible = true;
@@ -1056,7 +1093,10 @@ function openVrMenu() {
   menuLaser.visible = true;
 }
 async function menuAction(action: string) {
-  if (action.startsWith("range-")) {
+  if (action === "qualification") {
+    courseName = "qualification";
+    await start("runthrough", false);
+  } else if (action.startsWith("range-")) {
     await start(action.slice(6) as RangeId, false);
   } else if (action === "resume") {
     if (!playing || finished) await start(selected, false);
@@ -1096,8 +1136,8 @@ async function menuAction(action: string) {
   } else if (action === "reset") standardTargets();
   else if (action === "finish") finish();
   else if (action === "course") {
-    courseName = ["basic", "cover", "night"][
-      (["basic", "cover", "night"].indexOf(courseName) + 1) % 3
+    courseName = ["basic", "cover", "night", "qualification"][
+      (["basic", "cover", "night", "qualification"].indexOf(courseName) + 1) % 4
     ];
     await start("runthrough", false);
   } else if (action === "mode") {
@@ -1360,22 +1400,33 @@ function frame(now: number) {
     elapsed += dt;
     if (renderer.xr.isPresenting) updateXR(dt);
     else {
+      const turn =
+        Number(keys.has("KeyQ") || keys.has("ArrowLeft")) -
+        Number(keys.has("KeyE") || keys.has("ArrowRight"));
+      camera.rotation.y += turn * dt * 1.8;
+      camera.rotation.x = T.MathUtils.clamp(
+        camera.rotation.x +
+          (Number(keys.has("ArrowUp")) - Number(keys.has("ArrowDown"))) *
+            dt *
+            1.2,
+        -1.5,
+        1.5,
+      );
       const v = new T.Vector3(
         Number(keys.has("KeyD")) - Number(keys.has("KeyA")),
         0,
         Number(keys.has("KeyS")) - Number(keys.has("KeyW")),
       );
       if (v.lengthSq())
-        v.normalize().multiplyScalar(dt * (keys.has("ShiftLeft") ? 5.5 : 3));
+        v.normalize().multiplyScalar(
+          dt * (keys.has("ShiftLeft") || keys.has("ShiftRight") ? 5.5 : 3),
+        );
       v.applyAxisAngle(
         new T.Vector3(0, 1, 0),
         camera.rotation.y + rig.rotation.y,
       );
       world.move(rig.position, v.x, v.z);
-      if (range === "standard" && !freeFly) {
-        rig.position.x = T.MathUtils.clamp(rig.position.x, -1.05, 1.05);
-        rig.position.z = T.MathUtils.clamp(rig.position.z, 1, 5);
-      }
+
       if (freeFly)
         rig.position.y +=
           dt * 3 * (Number(keys.has("Space")) - Number(keys.has("KeyC")));
@@ -1403,7 +1454,10 @@ function frame(now: number) {
     }
     if (range === "runthrough") {
       for (const [i, s] of course.stations.entries()) {
-        if (rig.position.z <= s.z && !activated.has(i)) {
+        const playerPosition = renderer.xr.isPresenting
+          ? camera.getWorldPosition(new T.Vector3())
+          : rig.position;
+        if (i === activated.size && stationReached(playerPosition, s)) {
           activated.add(i);
           toast(`STATION 0${i + 1}`, 1);
           tone(850, 0.12, 0.045);
@@ -1437,14 +1491,36 @@ function frame(now: number) {
       const next = course.stations.find(
         (_: unknown, i: number) => !activated.has(i),
       );
-      const remaining = Math.max(
-        0,
-        rig.position.z - (next?.z ?? course.finish),
+      const finishPoint =
+        typeof course.finish === "number"
+          ? { x: 0, z: course.finish }
+          : course.finish;
+      const playerPosition = camera.getWorldPosition(new T.Vector3());
+      const view = camera.getWorldDirection(new T.Vector3());
+      const heading = waypoint(
+        playerPosition,
+        next ?? finishPoint,
+        Math.atan2(-view.x, -view.z),
       );
-      $("#course-guide").textContent = next
-        ? `STATION ${activated.size + 1} · ${Math.ceil(remaining)}m AHEAD  /  WASD WALK · SHIFT RUN`
-        : `FINISH GATE · ${Math.ceil(remaining)}m AHEAD`;
-      if (rig.position.z <= course.finish) finish();
+      const bearing =
+        Math.abs(heading.angle) < 0.35
+          ? "↑ AHEAD"
+          : Math.abs(heading.angle) > 2.6
+            ? "↓ BEHIND"
+            : heading.angle > 0
+              ? "← LEFT"
+              : "→ RIGHT";
+      $("#course-guide").textContent =
+        `${next ? (next.label ?? `STATION ${activated.size + 1}`) : "FINISH GATE"} · ${Math.ceil(heading.distance)}m ${bearing} / ${activated.size} OF ${course.stations.length} ${course.indoors ? "ROOMS" : "STATIONS"}`;
+      if (
+        finishReached(
+          playerPosition,
+          course.finish,
+          activated.size,
+          course.stations.length,
+        )
+      )
+        finish();
       if (elapsed - lastGhost > 0.1) {
         ghostSamples.push({ t: elapsed, x: rig.position.x, z: rig.position.z });
         lastGhost = elapsed;
@@ -1501,7 +1577,7 @@ function frame(now: number) {
       range === "warehouse"
         ? `${Math.ceil(health)} / ${wave}`
         : range === "runthrough"
-          ? `${activated.size} / 5`
+          ? `${activated.size} / ${course.stations.length}`
           : `${distance}m`;
     $("#weapon-label").textContent =
       `${WEAPONS[weapon.index].short} · ${WEAPONS[weapon.index].name.toUpperCase()}`;
@@ -1521,6 +1597,10 @@ function frame(now: number) {
     const t = time * 0.04;
     camera.position.x = Math.sin(t) * 0.12;
   }
+  $("#look-hint").classList.toggle(
+    "hidden",
+    !!document.pointerLockElement || renderer.xr.isPresenting,
+  );
   $("#crosshair").classList.toggle("hidden", renderer.xr.isPresenting);
   ghost.visible = ghost.visible && playing && range === "runthrough";
   renderer.render(scene, camera);
@@ -1558,7 +1638,18 @@ function switchWeapon(i: number) {
   tone(300, 0.05, 0.025);
 }
 document.addEventListener("keydown", (e) => {
-  if (["F1", "F2", "Space"].includes(e.code)) e.preventDefault();
+  if (
+    [
+      "F1",
+      "F2",
+      "Space",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+    ].includes(e.code)
+  )
+    e.preventDefault();
   keys.add(e.code);
   if (e.repeat) return;
   if (e.code === "Escape" && playing && !paused) pause();
@@ -1647,18 +1738,16 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   if (el.dataset.range) {
     selected = el.dataset.range as RangeId;
+    if (el.dataset.course) courseName = el.dataset.course;
     $("#play").innerHTML =
-      selected === "runthrough"
-        ? "RUN THE POP-UP COURSE <span>↗</span>"
-        : "ENTER THE RANGE <span>↗</span>";
+      courseName === "qualification" && selected === "runthrough"
+        ? "RUN QUALIFICATION HOUSE <span>↗</span>"
+        : selected === "runthrough"
+          ? "RUN THE POP-UP COURSE <span>↗</span>"
+          : "ENTER THE RANGE <span>↗</span>";
     document
       .querySelectorAll(".card")
-      .forEach((c) =>
-        c.classList.toggle(
-          "selected",
-          (c as HTMLElement).dataset.range === selected,
-        ),
-      );
+      .forEach((c) => c.classList.toggle("selected", c === el));
     return;
   }
   if (el.dataset.distance) {
@@ -1783,7 +1872,11 @@ async function init() {
         return {
           cameraPosition: camera.getWorldPosition(new T.Vector3()).toArray(),
           cameraDirection: camera.getWorldDirection(new T.Vector3()).toArray(),
+          lookYaw: camera.rotation.y + rig.rotation.y,
           range,
+          courseName,
+          elapsed,
+          finished,
           playing,
           paused,
           shots,

@@ -56,7 +56,13 @@ function frame(s, z, w = 24) {
   for (const x of [-w / 2, w / 2])
     box(s, "column", x, 2.5, z, 0.3, 5, 0.3, "metal");
 }
-for (const id of ["hub", "standard", "runthrough", "warehouse"]) {
+for (const id of [
+  "hub",
+  "standard",
+  "runthrough",
+  "warehouse",
+  "qualification",
+]) {
   const s = new T.Scene();
   s.name = id;
   marker(s, "SPAWN_player", 0, 0, id === "standard" ? 3 : 5);
@@ -69,7 +75,7 @@ for (const id of ["hub", "standard", "runthrough", "warehouse"]) {
     for (let lane = -4; lane <= 5; lane++) {
       const x = lane * 3;
       box(s, "booth", x - 1.45, 1.4, 2, 0.13, 2.8, 4, "metal");
-      box(s, "bench", x, 0.88, 0.2, 2.5, 0.13, 0.9, "wood");
+      box(s, "bench", x - 0.5, 0.88, 0.2, 1.25, 0.13, 0.9, "wood");
       box(s, "rail", x, 4, -24, 0.05, 0.08, 53, "metal", false);
       box(
         s,
@@ -116,6 +122,76 @@ for (const id of ["hub", "standard", "runthrough", "warehouse"]) {
     box(s, "finish_gate", 0, 3, -79, 12, 0.3, 0.3, "lime", false);
     for (let x of [-6, 6])
       box(s, "finish_post", x, 1.5, -79, 0.25, 3, 0.25, "metal");
+  } else if (id === "qualification") {
+    box(s, "floor", 0, -0.2, -11, 34, 0.4, 36, "floor");
+    for (const x of [-17, 17])
+      box(s, "outer_wall", x, 2, -11, 0.3, 4, 36, "concrete");
+    for (const z of [-29, 7])
+      box(s, "outer_wall", 0, 2, z, 34, 4, 0.3, "concrete");
+    // Six connected rooms, with doorways requiring right, left and 180-degree turns.
+    for (const x of [-5, 5])
+      for (const [z, length] of [
+        [-26, 6],
+        [-15, 8],
+        [0, 14],
+      ]) {
+        box(s, "partition", x, 1.6, z, 0.18, 3.2, length, "wood");
+        box(s, "partition_cap", x, 3.23, z, 0.24, 0.1, length, "metal", false);
+      }
+    for (const [x, length] of [
+      [-14.5, 5],
+      [0, 16],
+      [14.5, 5],
+    ])
+      box(s, "cross_wall", x, 1.6, -15, length, 3.2, 0.18, "wood");
+    for (const x of [-10, 10]) {
+      box(s, "door_header", x, 2.8, -15, 4, 0.8, 0.2, "metal", false);
+    }
+    for (const x of [-5, 5])
+      for (const z of [-9, -21])
+        box(s, "door_header", x, 2.8, z, 0.2, 0.8, 4, "metal", false);
+    const route = [
+      [0, 3],
+      [0, -9],
+      [10, -9],
+      [10, -21],
+      [0, -21],
+      [-10, -21],
+      [-10, 3],
+    ];
+    for (let i = 1; i < route.length; i++) {
+      const [ax, az] = route[i - 1],
+        [bx, bz] = route[i],
+        length = Math.hypot(bx - ax, bz - az);
+      for (let t = 1; t < length; t += 2) {
+        const x = ax + ((bx - ax) * t) / length,
+          z = az + ((bz - az) * t) / length;
+        const stripe = box(
+          s,
+          "route_dash",
+          x,
+          0.015,
+          z,
+          0.12,
+          0.02,
+          0.65,
+          "lime",
+          false,
+        );
+        stripe.rotation.y = Math.atan2(bx - ax, bz - az);
+      }
+    }
+    for (const x of [-10, 0, 10])
+      for (const z of [-9, -21]) {
+        box(s, "overhead_fixture", x, 4.1, z, 3, 0.08, 0.3, "lime", false);
+        box(s, "crate", x + 3.7, 0.45, z + 2, 1, 0.9, 1, "metal");
+      }
+    for (const x of [-1.8, 1.8])
+      box(s, "start_post", x, 1.25, 1, 0.15, 2.5, 0.15, "metal");
+    box(s, "start_header", 0, 2.5, 1, 3.75, 0.25, 0.2, "lime", false);
+    for (const x of [-11.8, -8.2])
+      box(s, "finish_post", x, 1.25, 3, 0.15, 2.5, 0.15, "metal");
+    box(s, "finish_header", -10, 2.5, 3, 3.75, 0.25, 0.2, "lime", false);
   } else {
     box(s, "floor", 0, -0.2, -10, 40, 0.4, 30, "floor");
     for (const x of [-20, 20]) box(s, "wall", x, 3, -10, 0.5, 6, 30);
