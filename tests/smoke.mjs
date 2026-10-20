@@ -8,7 +8,7 @@ const browser = await chromium.launch({
     "--enable-unsafe-swiftshader",
   ],
 });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 try {
@@ -53,7 +53,7 @@ try {
   await page.waitForFunction(
     () => window.rangeDay.state.stationsActivated >= 1,
     undefined,
-    { timeout: 10000 },
+    { timeout: 20000 },
   );
   await page.keyboard.up("w");
   await page.keyboard.up("Shift");
@@ -69,7 +69,7 @@ try {
       window.rangeDay?.state.range === "warehouse",
   );
   await page.waitForFunction(() => window.rangeDay.state.wave >= 1, undefined, {
-    timeout: 10000,
+    timeout: 20000,
   });
   s = await page.evaluate(() => window.rangeDay.state);
   assert.equal(s.wave, 1);

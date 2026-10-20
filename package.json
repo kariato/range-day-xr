@@ -17,7 +17,11 @@
     "assets:weapons:generate": "python3 tools/build_weapons.py --generate",
     "assets:weapon-animations": "node --import tsx tools/animate-weapons.ts",
     "test:firing": "node tests/firing.mjs",
-    "test:environment": "node tests/environment.mjs"
+    "test:environment": "node tests/environment.mjs",
+    "test:training-art": "node tests/training-art.mjs",
+    "check:environments": "node tools/check-environment-budgets.mjs",
+    "test:quest2": "node tests/quest2-smoke.mjs",
+    "test:scene-memory": "node tests/scene-memory.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.19.0",

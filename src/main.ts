@@ -1,3 +1,5 @@
+import budgets from "./rendering/budgets.json";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { WeaponEffects } from "./weapons/effects";
 import { WeaponModels } from "./weapons/models";
 import { RecoilSpring } from "./weapons/recoil";
@@ -91,7 +93,8 @@ const renderer = new T.WebGLRenderer({
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.xr.enabled = true;
-renderer.xr.setFoveation(1);
+renderer.xr.setFoveation(budgets.xrFoveation);
+renderer.xr.setFramebufferScaleFactor(budgets.xrFramebufferScale);
 renderer.outputColorSpace = T.SRGBColorSpace;
 renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
@@ -435,8 +438,8 @@ function addTarget(
   }
   return target;
 }
-function clearDynamics() {
-  dynamics.traverse((o) => {
+function disposeDynamicMeshes(root: T.Object3D) {
+  root.traverse((o) => {
     if (o instanceof T.Mesh) {
       o.geometry.dispose();
       const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -446,6 +449,9 @@ function clearDynamics() {
       });
     }
   });
+}
+function clearDynamics() {
+  disposeDynamicMeshes(dynamics);
   dynamics.clear();
   targets.length = dummies.length = decals.length = balls.length = 0;
 }
@@ -725,12 +731,12 @@ async function start(id: RangeId, flat = true) {
       }
       dynamics.add(finish);
       flashlight.visible = course.night;
-      sun.intensity = course.night ? 0.05 : 2.8;
+      sun.intensity = course.night ? 0.05 : course.indoors ? 1.25 : 2.8;
       (
         scene.children.find(
           (c) => c instanceof T.HemisphereLight,
         ) as T.HemisphereLight
-      ).intensity = course.night ? 0.15 : 2.3;
+      ).intensity = course.night ? 0.15 : course.indoors ? 1.8 : 2.3;
       if (course.night) {
         scene.background = new T.Color("#091424");
         scene.fog = new T.Fog("#091424", 5, 35);
@@ -749,12 +755,12 @@ async function start(id: RangeId, flat = true) {
       if (warehouseMode === "sandbox") breakUntil = Infinity;
     }
     if (id !== "runthrough") {
-      sun.intensity = id === "standard" ? 1.25 : 2.8;
+      sun.intensity = id === "standard" ? 1.25 : 1.6;
       (
         scene.children.find(
           (c) => c instanceof T.HemisphereLight,
         ) as T.HemisphereLight
-      ).intensity = id === "standard" ? 1.8 : 2.3;
+      ).intensity = id === "standard" ? 1.8 : 2.0;
     }
     updateControls();
     if (id === "standard") {
@@ -830,14 +836,34 @@ function spawnDummy(type?: string) {
   head.scale.y = 1.2;
   head.position.y = 1.65;
   group.add(head);
-  for (let side of [-1, 1]) {
-    const leg = box(0.14, 0.62, 0.17, 0xb96534);
-    leg.position.set(side * 0.15, 0.32, 0);
-    group.add(leg);
-    const arm = box(0.12, 0.6, 0.14, 0xd58446);
-    arm.position.set(side * 0.34, 1.05, 0);
-    group.add(arm);
+  // Limbs share one draw while retaining the original hit zone and colors.
+  const limbGeometries: T.BufferGeometry[] = [];
+  for (const side of [-1, 1]) {
+    for (const [w, h, d, x, y, color] of [
+      [0.14, 0.62, 0.17, side * 0.15, 0.32, 0xb96534],
+      [0.12, 0.6, 0.14, side * 0.34, 1.05, 0xd58446],
+    ]) {
+      const geometry = new T.BoxGeometry(w, h, d).translate(x, y, 0),
+        c = new T.Color(color);
+      const colors = new Float32Array(
+        geometry.getAttribute("position").count * 3,
+      );
+      for (let i = 0; i < colors.length; i += 3) {
+        colors[i] = c.r;
+        colors[i + 1] = c.g;
+        colors[i + 2] = c.b;
+      }
+      geometry.setAttribute("color", new T.BufferAttribute(colors, 3));
+      limbGeometries.push(geometry);
+    }
   }
+  group.add(
+    new T.Mesh(
+      mergeGeometries(limbGeometries)!,
+      new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.65 }),
+    ),
+  );
+  limbGeometries.forEach((g) => g.dispose());
   const target = new T.Mesh(
     new T.CircleGeometry(0.15, 16),
     new T.MeshBasicMaterial({ map: paperTexture("paper") }),
@@ -1009,6 +1035,7 @@ function fire() {
         stopped++;
         points += 50;
         dynamics.remove(d.group);
+        disposeDynamicMeshes(d.group);
         dummies.splice(dummies.indexOf(d), 1);
       }
     }
@@ -1474,12 +1501,14 @@ function updateDummies(dt: number) {
     if (b.mesh.position.distanceTo(p) < 0.35) {
       damage(10);
       b.mesh.removeFromParent();
+      disposeDynamicMeshes(b.mesh);
       balls.splice(i, 1);
     } else if (
       b.mesh.position.distanceTo(p) > 50 ||
       world.blocked(b.mesh.position.x, b.mesh.position.z)
     ) {
       b.mesh.removeFromParent();
+      disposeDynamicMeshes(b.mesh);
       balls.splice(i, 1);
     }
   }
@@ -1964,6 +1993,14 @@ window.addEventListener("resize", () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 renderer.xr.addEventListener("sessionstart", () => {
+  const session = renderer.xr.getSession();
+  if (
+    session?.supportedFrameRates?.includes(budgets.preferredFrameRate) &&
+    typeof session.updateTargetFrameRate === "function"
+  )
+    void session
+      .updateTargetFrameRate(budgets.preferredFrameRate)
+      .catch(() => {});
   document.exitPointerLock();
   attachGun();
   $("#shell").classList.add("hidden");
@@ -2001,10 +2038,16 @@ async function init() {
     gun.visible = false;
     if (
       import.meta.env.DEV &&
-      new URLSearchParams(location.search).get("emulate") === "quest3"
+      ["quest2", "quest3"].includes(
+        new URLSearchParams(location.search).get("emulate") ?? "",
+      )
     ) {
-      const { XRDevice, metaQuest3 } = await import("iwer");
-      const device = new XRDevice(metaQuest3);
+      const { XRDevice, metaQuest2, metaQuest3 } = await import("iwer");
+      const device = new XRDevice(
+        new URLSearchParams(location.search).get("emulate") === "quest2"
+          ? metaQuest2
+          : metaQuest3,
+      );
       device.installRuntime({ forceInstall: true });
       const { DevUI } = await import("@iwer/devui");
       new DevUI(device);
@@ -2037,6 +2080,7 @@ async function init() {
           points,
           health,
           wave,
+          dummyCount: dummies.length,
           targets: targets.length,
           stationsActivated: activated.size,
           visiblePopups: targets.filter(
@@ -2048,6 +2092,17 @@ async function init() {
           drawCalls: renderer.info.render.calls,
           triangles: renderer.info.render.triangles,
           modelLoaded: world.root.children.length > 0,
+          environmentResources: {
+            cachedScenes: world.cache.size,
+            batchedMeshes: world.root.children.length,
+            gpuGeometries: renderer.info.memory.geometries,
+            gpuTextures: renderer.info.memory.textures,
+          },
+          xrProfile: {
+            framebufferScale: budgets.xrFramebufferScale,
+            foveation: renderer.xr.getFoveation(),
+            frameRate: renderer.xr.getSession()?.frameRate ?? null,
+          },
           ammo: weapon.ammo,
           magazine: weapon.magazine,
           chambered: weapon.chambered,

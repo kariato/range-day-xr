@@ -1,0 +1,30 @@
+[
+  {
+    "asset": "Concrete034",
+    "source": "https://ambientcg.com/a/Concrete034",
+    "license": "CC0-1.0",
+    "archive": "range-concrete.zip",
+    "archiveSHA256": "5839d284d94ffb8d2a56df742ec522b13dd311c52dbd42b8fd33f0409ceedb81",
+    "albedoMaxDimension": 512,
+    "normalRoughnessMaxDimension": 256,
+    "albedoLinearTint": [
+      0.55,
+      0.57,
+      0.6
+    ]
+  },
+  {
+    "asset": "Gravel023",
+    "source": "https://ambientcg.com/a/Gravel023",
+    "license": "CC0-1.0",
+    "archive": "range-gravel.zip",
+    "archiveSHA256": "a00e7fd6246db4ae228473aac14f1bc427bd93f228ebe347a5d6390dd838b0a8",
+    "albedoMaxDimension": 512,
+    "normalRoughnessMaxDimension": 256,
+    "albedoLinearTint": [
+      0.36,
+      0.3,
+      0.22
+    ]
+  }
+]

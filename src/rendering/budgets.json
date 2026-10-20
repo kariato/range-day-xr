@@ -1,0 +1,12 @@
+{
+  "maxEnvironmentTriangles": 90000,
+  "maxEnvironmentMaterials": 16,
+  "maxTextureDimension": 512,
+  "maxTextureMemoryMiB": 8,
+  "maxEnvironmentFileMiB": 8,
+  "maxSceneDrawCallsPerView": 100,
+  "maxCachedScenes": 2,
+  "xrFramebufferScale": 0.9,
+  "xrFoveation": 1,
+  "preferredFrameRate": 72
+}

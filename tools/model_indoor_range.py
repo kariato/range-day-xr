@@ -7,33 +7,42 @@ from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.noise import noise_vector
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from environment_shading import bake_vertex_lighting
+from environment_textures import install_photo_material
 root=Path(sys.argv[sys.argv.index('--')+1]).resolve()
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 random.seed(42)
 visual=[]; materials={}
 def vec(p): return (p[0],-p[2],p[1])
 def material(name,color,rough=.7,metal=0,texture=None,emission=0):
-    m=bpy.data.materials.new(name); m.use_nodes=True
+    m=bpy.data.materials.new(name); m.use_nodes=True; m.use_backface_culling=True
     bs=m.node_tree.nodes.get('Principled BSDF'); bs.inputs['Base Color'].default_value=(*color,1)
     bs.inputs['Roughness'].default_value=rough; bs.inputs['Metallic'].default_value=metal
     if emission:
         bs.inputs['Emission Color'].default_value=(*color,1); bs.inputs['Emission Strength'].default_value=emission
     if texture:
-        size=256; values=[]; heights=[]
+        size=256; values=[]; heights=[]; roughness=[]
         for y in range(size):
             for x in range(size):
                 # Seamless periodic texture: grain, aggregate, worn pores or wood fibres.
                 u=x/size; v=y/size
                 n=(math.sin(x*12.9898+y*78.233)*43758.5453)%1
                 broad=math.sin(2*math.pi*u*5+math.sin(2*math.pi*v*3))*.35+math.cos(2*math.pi*v*7)*.2
-                if texture=='wood': tone=.84+.09*math.sin(u*math.pi*64+math.sin(v*math.pi*4)*2)+n*.08; height=tone
+                if texture=='wood': tone=.86+.035*math.sin(u*math.pi*64+math.sin(v*math.pi*4)*1.3)+.025*math.sin(u*math.pi*179+v*2)+n*.07; height=tone*.3
                 elif texture=='acoustic': tone=.72+.23*n-.15*(x%6==0 or y%6==0); height=n
                 elif texture=='rubber': tone=.72+.30*n+.05*broad; height=n
-                else: tone=.82+.15*n+.12*broad; height=n*.4+broad*.3
+                else: tone=.88+.10*n+.018*broad; height=n*.4+broad*.3
+                roughness.append(max(.12,min(1,rough+(n-.5)*.12+(tone-.9)*.18)))
                 heights.append(height); values.extend([min(1,max(0,c*tone)) for c in color]+[1])
         image=bpy.data.images.new(name+' • albedo',size,size); image.pixels.foreach_set(values); image.pack()
         node=m.node_tree.nodes.new('ShaderNodeTexImage'); node.image=image
         m.node_tree.links.new(node.outputs['Color'],bs.inputs['Base Color'])
+        # Single packed roughness texture (G channel), with no extra materials.
+        orm=bpy.data.images.new(name+' • roughness',size,size);orm.colorspace_settings.name='Non-Color'
+        orm.pixels.foreach_set([c for r in roughness for c in (1,r,1,1)]);orm.pack()
+        rough_node=m.node_tree.nodes.new('ShaderNodeTexImage');rough_node.image=orm
+        separate=m.node_tree.nodes.new('ShaderNodeSeparateColor');m.node_tree.links.new(rough_node.outputs['Color'],separate.inputs['Color']);m.node_tree.links.new(separate.outputs['Green'],bs.inputs['Roughness'])
         normals=[]
         for y in range(size):
             for x in range(size):
@@ -42,7 +51,7 @@ def material(name,color,rough=.7,metal=0,texture=None,emission=0):
                 n=Vector((-dx,-dy,1)).normalized(); normals.extend([n.x*.5+.5,n.y*.5+.5,n.z*.5+.5,1])
         image=bpy.data.images.new(name+' • normal',size,size); image.colorspace_settings.name='Non-Color'; image.pixels.foreach_set(normals); image.pack()
         tex=m.node_tree.nodes.new('ShaderNodeTexImage');tex.image=image
-        normal=m.node_tree.nodes.new('ShaderNodeNormalMap'); normal.inputs['Strength'].default_value=.45
+        normal=m.node_tree.nodes.new('ShaderNodeNormalMap'); normal.inputs['Strength'].default_value=.28
         m.node_tree.links.new(tex.outputs['Color'],normal.inputs['Color']);m.node_tree.links.new(normal.outputs['Normal'],bs.inputs['Normal'])
     materials[name]=m; return m
 concrete=material('Poured concrete',(.48,.50,.52),texture='concrete')
@@ -57,15 +66,18 @@ white=material('Warm white safety lettering',(.78,.82,.84),.8)
 yellow=material('Muted safety amber',(.72,.46,.095),.72)
 light=material('LED diffuser',(.82,.90,1),.4,emission=2)
 glass=material('Observation glass',(.12,.22,.30),.18,.35)
+for photo_mat in [concrete,floor]:install_photo_material(photo_mat,root,'concrete')
 def uv_project(o,scale=1):
     for layer in list(o.data.uv_layers): o.data.uv_layers.remove(layer)
     uv=o.data.uv_layers.new(name='Surface UV')
+    albedo=next((n.image for n in o.data.materials[0].node_tree.nodes if n.type=='TEX_IMAGE' and n.image and 'albedo' in n.image.name),None)
+    aspect=albedo.size[0]/albedo.size[1] if albedo else 1
     for p in o.data.polygons:
         axis=max(range(3),key=lambda i:abs(p.normal[i]))
         axes=[i for i in range(3) if i!=axis]
         for li in p.loop_indices:
             co=o.matrix_world@o.data.vertices[o.data.loops[li].vertex_index].co
-            uv.data[li].uv=(co[axes[0]]/scale,co[axes[1]]/scale)
+            uv.data[li].uv=(co[axes[0]]/scale,co[axes[1]]/scale*aspect)
 def box(name,p,size,mat,bevel=0,collide=False):
     bpy.ops.mesh.primitive_cube_add(size=1,location=vec(p));o=bpy.context.object;o.name=name;o.dimensions=(size[0],size[2],size[1]);bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
     if bevel:
@@ -85,17 +97,18 @@ def cylinder(name,p,radius,length,mat,axis='y'):
     if axis=='z':o.rotation_euler.x=math.pi/2
     if axis=='x':o.rotation_euler.y=math.pi/2
     bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
+    for face in o.data.polygons:face.use_smooth=abs(face.normal.z)<.6
     o.data.materials.append(mat);uv_project(o,1);visual.append(o);return o
 def text(name,body,p,size,mat=white,flip=False):
-    bpy.ops.object.text_add(location=vec(p));o=bpy.context.object;o.name=name;o.data.body=body;o.data.size=size;o.data.align_x='CENTER';o.data.align_y='CENTER';o.data.extrude=.0005
+    bpy.ops.object.text_add(location=vec(p));o=bpy.context.object;o.name=name;o.data.body=body;o.data.size=size;o.data.align_x='CENTER';o.data.align_y='CENTER';o.data.extrude=0;o.data.resolution_u=3
     # Face toward entrance (+game Z), or toward firing line for rear wall.
     o.rotation_euler=(math.pi/2,0,math.pi if flip else 0);o.data.materials.append(mat)
     bpy.ops.object.convert(target='MESH');visual.append(bpy.context.object)
     uv_project(bpy.context.object)
 def slab_grid(name,y,mat):
-    verts=[];faces=[];nx=44;nz=124
+    verts=[];faces=[];nx=44 if y==0 else 22;nz=124 if y==0 else 62
     for j in range(nz+1):
-        for i in range(nx+1):verts.append(vec((-11+i*.5,y,10-j*.5)))
+        for i in range(nx+1):verts.append(vec((-11+i*22/nx,y,10-j*62/nz)))
     for j in range(nz):
         for i in range(nx):
             a=j*(nx+1)+i;f=(a,a+nx+1,a+nx+2,a+1);faces.append(tuple(reversed(f)) if y==0 else f)
@@ -175,44 +188,22 @@ for z in [-5,-10,-15,-25,-50]:
     box('Distance line',(0,.008,z),(21.7,.008,.045),white)
     for x in [-8.1,-4.5,2.7,6.3]:
         # Small raised text plane lies on floor, readable when looking downrange.
-        bpy.ops.object.text_add(location=vec((x,.012,z+.25)));o=bpy.context.object;o.name='Distance floor label';o.data.body=f'{abs(z)} m';o.data.size=.20;o.data.align_x='CENTER';o.data.materials.append(white);bpy.ops.object.convert(target='MESH');visual.append(bpy.context.object);uv_project(bpy.context.object)
+        bpy.ops.object.text_add(location=vec((x,.012,z+.25)));o=bpy.context.object;o.name='Distance floor label';o.data.body=f'{abs(z)} m';o.data.size=.20;o.data.resolution_u=3;o.data.align_x='CENTER';o.data.materials.append(white);bpy.ops.object.convert(target='MESH');visual.append(bpy.context.object);uv_project(bpy.context.object)
 for z in range(-48,9,4):
     box('Slab expansion joint',(0,.002,z),(21.8,.003,.012),dark)
 box('Ready area blue band',(0,.005,5.05),(21.8,.008,.07),blue)
 text('Wall range identifier','RANGE DAY  /  PRECISION',(0,3.65,-51.10),.55)
-# Bake local ambient occlusion into vertex colour using the authored geometry BVH.
-# This remains static and costs no real-time shadow maps on Quest.
-bpy.context.view_layer.update()
-verts=[];faces=[]
-for o in visual:
-    base=len(verts);verts.extend(o.matrix_world@v.co for v in o.data.vertices)
-    faces.extend(tuple(base+i for i in p.vertices) for p in o.data.polygons)
-bvh=BVHTree.FromPolygons(verts,faces)
-random.seed(17)
-for o in visual:
-    attr=o.data.color_attributes.new(name='Baked ambient occlusion',type='FLOAT_COLOR',domain='CORNER')
-    for p in o.data.polygons:
-        normal=(o.matrix_world.to_3x3()@p.normal).normalized()
-        tangent=normal.cross(Vector((.31,.51,.83))).normalized();bitangent=normal.cross(tangent)
-        for li in p.loop_indices:
-            pos=o.matrix_world@o.data.vertices[o.data.loops[li].vertex_index].co+normal*.006
-            blocked=0
-            for k in range(6):
-                a=k*2.399963; r=math.sqrt((k+.5)/6)*.9
-                direction=(normal*math.sqrt(1-r*r)+tangent*(math.cos(a)*r)+bitangent*(math.sin(a)*r)).normalized()
-                hit=bvh.ray_cast(pos,direction,1.15)
-                if hit[0] is not None:blocked+=(1-hit[3]/1.15)
-            shade=max(.48,1-blocked/6*.72)
-            attr.data[li].color=(shade,shade,shade,1)
-    o.data.color_attributes.active_color=attr
-print('Baked vertex occlusion:',len(visual),'meshes',len(verts),'vertices',flush=True)
+# Offline visibility and falloff from the modeled ceiling fixtures, plus contact AO.
+fixture_points=[vec((x,4.10,z)) for z in [6,-2,-10,-18,-26,-34,-42,-50] for x in [-8,-4,0,4,8]]
+fixture_points += [vec((lane*1.8,3.15,2.1)) for lane in range(-4,6)]
+bake_vertex_lighting(visual,fixture_points)
 # Editable source includes preview area lighting and a camera.
 for z in [3,-10,-25,-40]:
     bpy.ops.object.light_add(type='AREA',location=vec((0,4,z)));o=bpy.context.object;o.name='Preview ceiling light';o.data.energy=1400;o.data.shape='RECTANGLE';o.data.size=18;o.data.size_y=6
 bpy.ops.object.camera_add(location=vec((0,1.65,5.5)));cam=bpy.context.object;cam.name='Player eye preview';cam.rotation_euler=(Vector(vec((0,1.65,-20)))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.lens=22;bpy.context.scene.camera=cam
 bpy.context.scene.world.color=(.25,.28,.32)
-bpy.context.scene['asset_version']='indoor-range-art-v1'
-bpy.context.scene['notes']='Original Blender environment; packed PBR textures; baked vertex AO; game coordinates in helper script.'
+bpy.context.scene['asset_version']='indoor-range-quest2-v2'
+bpy.context.scene['notes']='Original Blender environment; packed PBR textures; baked vertex lighting/AO; game coordinates in helper script.'
 source=root/'assets/standard.blend';source.parent.mkdir(exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(source))
 # Vertex color export selection is explicit; lights and preview cameras stay in source only.

@@ -1,4 +1,5 @@
 import * as T from "three";
+import budgets from "./rendering/budgets.json";
 import RAPIER from "@dimforge/rapier3d-compat";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -33,6 +34,9 @@ export class World {
   async load(id: string) {
     this.physics?.free();
     this.physics = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
+    // Merged geometries belong to this visit; source materials stay in the bounded cache.
+    for (const child of this.root.children)
+      if (child instanceof T.Mesh) child.geometry.dispose();
     this.root.clear();
     this.colliders = [];
     this.bounds = null;
@@ -41,10 +45,32 @@ export class World {
     let model = this.cache.get(id);
     if (!model) {
       const gltf = await this.loader.loadAsync(
-        `${import.meta.env.BASE_URL}models/${id}.glb`,
+        `${import.meta.env.BASE_URL}models/${id}.glb?art=quest2-20261020-v2`,
       );
       model = gltf.scene;
       this.cache.set(id, model);
+    }
+    // Refresh LRU order and release evicted source buffers/textures.
+    this.cache.delete(id);
+    this.cache.set(id, model);
+    while (this.cache.size > budgets.maxCachedScenes) {
+      const oldest = this.cache.keys().next().value!;
+      const evicted = this.cache.get(oldest)!;
+      const materials = new Set<T.Material>(),
+        textures = new Set<T.Texture>();
+      evicted.traverse((o) => {
+        if (!(o instanceof T.Mesh)) return;
+        o.geometry.dispose();
+        for (const m of Array.isArray(o.material) ? o.material : [o.material])
+          materials.add(m);
+      });
+      for (const material of materials) {
+        for (const value of Object.values(material))
+          if (value instanceof T.Texture) textures.add(value);
+        material.dispose();
+      }
+      textures.forEach((t) => t.dispose());
+      this.cache.delete(oldest);
     }
     const src = model.clone(true);
     src.updateMatrixWorld(true);
@@ -81,7 +107,8 @@ export class World {
         return;
       }
       if (o instanceof T.Mesh) {
-        const mat = o.material as T.Material;
+        const mat = o.material as T.MeshStandardMaterial;
+        if (mat.map) mat.map.anisotropy = 2;
         const entry = groups.get(mat) || { geos: [], mat };
         entry.geos.push(o.geometry.clone().applyMatrix4(o.matrixWorld));
         groups.set(mat, entry);

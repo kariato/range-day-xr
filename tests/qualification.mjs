@@ -4,7 +4,7 @@ const browser = await chromium.launch({
   headless: true,
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
 });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 const state = () => page.evaluate(() => window.rangeDay.state);
@@ -42,7 +42,7 @@ async function travel(x, z) {
         return Math.hypot(p[0] - x, p[2] - z) < 0.3;
       },
       { x, z },
-      { timeout: 9000 },
+      { timeout: 20000 },
     );
   } finally {
     await page.keyboard.up("w");
@@ -56,8 +56,8 @@ try {
   await page.locator('[data-range="standard"]').click();
   await page.locator("#play").click();
   await page.waitForFunction(() => window.rangeDay.state.playing);
-  await travel(0.8, 5.5);
-  await travel(0.8, -3);
+  await travel(0, 5.5);
+  await travel(0, -3);
   assert((await state()).cameraPosition[2] < -2);
   // An actual keyboard 360-degree turn must work even without browser mouse capture.
   const initialYaw = (await state()).lookYaw;

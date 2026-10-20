@@ -1,0 +1,53 @@
+{
+  "limits": {
+    "maxEnvironmentTriangles": 90000,
+    "maxEnvironmentMaterials": 16,
+    "maxTextureDimension": 512,
+    "maxTextureMemoryMiB": 8,
+    "maxEnvironmentFileMiB": 8,
+    "maxSceneDrawCallsPerView": 100,
+    "maxCachedScenes": 2,
+    "xrFramebufferScale": 0.9,
+    "xrFoveation": 1,
+    "preferredFrameRate": 72
+  },
+  "environments": [
+    {
+      "scene": "standard",
+      "triangles": 48130,
+      "materials": 12,
+      "textures": 12,
+      "maxTextureDimension": 512,
+      "textureMemoryMiB": 4,
+      "fileMiB": 4.4
+    },
+    {
+      "scene": "runthrough",
+      "triangles": 38201,
+      "materials": 10,
+      "textures": 10,
+      "maxTextureDimension": 512,
+      "textureMemoryMiB": 4.5,
+      "fileMiB": 3.02
+    },
+    {
+      "scene": "qualification",
+      "triangles": 17228,
+      "materials": 10,
+      "textures": 12,
+      "maxTextureDimension": 512,
+      "textureMemoryMiB": 4,
+      "fileMiB": 2
+    },
+    {
+      "scene": "warehouse",
+      "triangles": 27720,
+      "materials": 10,
+      "textures": 9,
+      "maxTextureDimension": 512,
+      "textureMemoryMiB": 3,
+      "fileMiB": 2.78
+    }
+  ],
+  "hardwareFrameRateVerified": false
+}
