@@ -1,0 +1,30 @@
+{
+  "name": "range-day-xr",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --import tsx --test src/game.test.ts",
+    "assets": "python3 tools/build_assets.py",
+    "test:browser": "node tests/smoke.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.0",
+    "three": "^0.180.0",
+    "three-pathfinding": "^1.3.0"
+  },
+  "devDependencies": {
+    "@iwer/devui": "^1.1.0",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^26.6.5",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "iwer": "^2.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  }
+}
