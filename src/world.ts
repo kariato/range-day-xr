@@ -144,14 +144,14 @@ export function box(w: number, h: number, d: number, color: number) {
     new T.MeshStandardMaterial({ color, roughness: 0.65 }),
   );
 }
-export function textBoard(text: string, w = 3, h = 0.6, color = "#d8ed8b") {
+export function textBoard(text: string, w = 3, h = 0.6, color = "#87d2ff") {
   const c = document.createElement("canvas");
   c.width = 1024;
   c.height = 256;
   const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#17221b";
+  ctx.fillStyle = "#152b45";
   ctx.fillRect(0, 0, 1024, 256);
-  ctx.strokeStyle = "#516444";
+  ctx.strokeStyle = "#527aa4";
   ctx.lineWidth = 6;
   ctx.strokeRect(3, 3, 1018, 250);
   ctx.fillStyle = color;

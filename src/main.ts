@@ -20,7 +20,7 @@ const $ = <E extends HTMLElement = HTMLElement>(s: string) =>
   document.querySelector<E>(s)!;
 const app = $("#app");
 const cross = `<svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="13" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="20" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M20 0v11m0 18v11M0 20h11m18 0h11" stroke="currentColor" stroke-width="1.6"/></svg>`;
-app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Explore every range with full 360° movement and looking.<br>Run the outdoor course or clear the new Qualification House.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 04</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough" data-course="basic"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button><button class="card" data-range="runthrough" data-course="qualification"><span class="num">04</span><span class="tag">NEW · 360° CQB</span><h2>QUALIFICATION HOUSE</h2><p>Clear six rooms. Turn every corner. Race the clock.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--lime)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="look-hint" id="look-hint">MOUSE: LOOK 360° · CLICK TO CAPTURE · RIGHT-DRAG OR Q/E TO TURN</div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">15</b> <span>/ <span id="capacity">15</span></span></div><div class="weapon-label" id="weapon-label">P15 · TRAINING PISTOL</div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>Q / E</kbd> TURN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
+app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Explore every range with full 360° movement and looking.<br>Run the outdoor course or clear the new Qualification House.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 04</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough" data-course="basic"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button><button class="card" data-range="runthrough" data-course="qualification"><span class="num">04</span><span class="tag">NEW · 360° CQB</span><h2>QUALIFICATION HOUSE</h2><p>Clear six rooms. Turn every corner. Race the clock.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--accent)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="look-hint" id="look-hint">MOUSE: LOOK 360° · CLICK TO CAPTURE · RIGHT-DRAG OR Q/E TO TURN</div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">15</b> <span>/ <span id="capacity">15</span></span></div><div class="weapon-label" id="weapon-label">P15 · TRAINING PISTOL</div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>Q / E</kbd> TURN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
 const save = loadSave(),
   world = new World();
 let resultsSummary = "";
@@ -72,8 +72,8 @@ let flashUntil = 0,
 const keys = new Set<string>(),
   weapon = new WeaponState();
 const scene = new T.Scene();
-scene.background = new T.Color("#35443a");
-scene.fog = new T.Fog("#35443a", 20, 85);
+scene.background = new T.Color("#384d65");
+scene.fog = new T.Fog("#384d65", 20, 85);
 const camera = new T.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 130);
 camera.rotation.order = "YXZ";
 const rig = new T.Group();
@@ -94,8 +94,8 @@ renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
 renderer.domElement.id = "world";
 document.body.prepend(renderer.domElement);
-scene.add(new T.HemisphereLight(0xe0efc3, 0x252820, 2.3));
-const sun = new T.DirectionalLight(0xffe4ae, 2.8);
+scene.add(new T.HemisphereLight(0xe5efff, 0x27364b, 2.3));
+const sun = new T.DirectionalLight(0xfff1dc, 2.8);
 sun.position.set(-5, 12, 5);
 scene.add(sun);
 scene.add(world.root);
@@ -152,7 +152,7 @@ function makeGun() {
 makeGun();
 camera.add(gun);
 gun.position.set(0.23, -0.21, -0.4);
-const flashlight = new T.SpotLight(0xecffd2, 12, 32, 0.45, 0.6, 1);
+const flashlight = new T.SpotLight(0xeaf4ff, 12, 32, 0.45, 0.6, 1);
 camera.add(flashlight, flashlight.target);
 flashlight.position.set(0.1, -0.1, -0.3);
 flashlight.target.position.set(0, 0, -20);
@@ -273,12 +273,12 @@ const menuLaser = new T.Line(
     new T.Vector3(),
     new T.Vector3(0, 0, -4),
   ]),
-  new T.LineBasicMaterial({ color: 0xdaef6b }),
+  new T.LineBasicMaterial({ color: 0x66c7ff }),
 );
 menuLaser.visible = false;
 const teleportMarker = new T.Mesh(
   new T.RingGeometry(0.2, 0.25, 32),
-  new T.MeshBasicMaterial({ color: 0xdaef6b, side: T.DoubleSide }),
+  new T.MeshBasicMaterial({ color: 0x66c7ff, side: T.DoubleSide }),
 );
 teleportMarker.rotation.x = -Math.PI / 2;
 teleportMarker.visible = false;
@@ -495,7 +495,7 @@ function records() {
     )
       .map(
         (id) =>
-          `<p style="color:var(--lime);letter-spacing:2px">${id.toUpperCase()}</p><table><tr><th>#</th><th>${id === "runthrough" ? "TIME + PENALTIES" : "POINTS"}</th><th>ACCURACY</th><th>DATE</th></tr>${
+          `<p style="color:var(--accent);letter-spacing:2px">${id.toUpperCase()}</p><table><tr><th>#</th><th>${id === "runthrough" ? "TIME + PENALTIES" : "POINTS"}</th><th>ACCURACY</th><th>DATE</th></tr>${
             save.scores[id].length
               ? save.scores[id]
                   .slice(0, 5)
@@ -593,11 +593,11 @@ async function start(id: RangeId, flat = true) {
     makeGun();
     flashlight.visible = false;
     scene.fog = new T.Fog(
-      id === "runthrough" ? "#899b75" : "#303e32",
+      id === "runthrough" ? "#9aafc3" : "#34475e",
       id === "runthrough" ? 30 : 18,
       100,
     );
-    scene.background = new T.Color(id === "runthrough" ? "#aebc9a" : "#303e32");
+    scene.background = new T.Color(id === "runthrough" ? "#c8dff1" : "#34475e");
     if (id === "standard") {
       standardTargets();
       const sign = textBoard("01 / STANDARD RANGE", 4, 0.65);
@@ -622,7 +622,7 @@ async function start(id: RangeId, flat = true) {
         sign.position.set((s.x ?? 0) - 2.5, 2.8, s.z);
         const ring = new T.Mesh(
           new T.RingGeometry(s.radius ?? 1.2, (s.radius ?? 1.2) + 0.07, 32),
-          new T.MeshBasicMaterial({ color: 0xdaef6b, side: T.DoubleSide }),
+          new T.MeshBasicMaterial({ color: 0x66c7ff, side: T.DoubleSide }),
         );
         ring.rotation.x = -Math.PI / 2;
         ring.position.set(s.x ?? 0, 0.025, s.z);
@@ -636,8 +636,8 @@ async function start(id: RangeId, flat = true) {
         typeof course.finish === "number" ? course.finish : course.finish.z,
       );
       if (course.indoors) {
-        scene.background = new T.Color("#516057");
-        scene.fog = new T.Fog("#516057", 25, 70);
+        scene.background = new T.Color("#4d6178");
+        scene.fog = new T.Fog("#4d6178", 25, 70);
         const title = textBoard("QUALIFICATION HOUSE · GO", 3.5, 0.5);
         title.position.set(0, 2.8, 1);
         dynamics.add(title);
@@ -651,8 +651,8 @@ async function start(id: RangeId, flat = true) {
         ) as T.HemisphereLight
       ).intensity = course.night ? 0.15 : 2.3;
       if (course.night) {
-        scene.background = new T.Color("#07110f");
-        scene.fog = new T.Fog("#07110f", 5, 35);
+        scene.background = new T.Color("#091424");
+        scene.fog = new T.Fog("#091424", 5, 35);
       }
     } else {
       breakUntil = 3;
@@ -1053,8 +1053,8 @@ function resume() {
 }
 async function coursePreview() {
   await world.load("runthrough");
-  scene.background = new T.Color("#aebc9a");
-  scene.fog = new T.Fog("#899b75", 30, 100);
+  scene.background = new T.Color("#c8dff1");
+  scene.fog = new T.Fog("#9aafc3", 30, 100);
   rig.position.set(3, 0, 4);
   camera.position.set(0, 2.2, 0);
   camera.lookAt(0, 1, -23);
@@ -1153,7 +1153,7 @@ async function menuAction(action: string) {
 const ghost = new T.Mesh(
   new T.CapsuleGeometry(0.22, 0.9, 3, 6),
   new T.MeshBasicMaterial({
-    color: 0xcfe7a0,
+    color: 0x87cfff,
     transparent: true,
     opacity: 0.18,
     depthWrite: false,
@@ -1610,9 +1610,9 @@ function updateWrist() {
     mat = mesh.material as T.MeshBasicMaterial;
   const canvas = mat.map!.image as HTMLCanvasElement,
     ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#17221b";
+  ctx.fillStyle = "#152b45";
   ctx.fillRect(0, 0, 1024, 256);
-  ctx.fillStyle = "#daef6b";
+  ctx.fillStyle = "#66c7ff";
   ctx.font = "bold 65px sans-serif";
   ctx.textAlign = "center";
   ctx.fillText(
