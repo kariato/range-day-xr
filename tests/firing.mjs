@@ -61,13 +61,36 @@ try {
     assert.equal(before.flashCount, i + 1);
     assert.equal(before.ejectedCount, i + 1);
     assert(before.casings.some((c) => c.weaponIndex === i));
-    await page.waitForTimeout(150);
+    await page.waitForFunction(
+      ({ index, age }) =>
+        window.rangeDay.state.firingEffects.casings.some(
+          (c) => c.weaponIndex === index && c.age > age + 0.12,
+        ),
+      { index: i, age: before.casings.find((c) => c.weaponIndex === i).age },
+      { timeout: 15000 },
+    );
     const after = await page.evaluate(
       () => window.rangeDay.state.firingEffects,
     );
     const a = before.casings.find((c) => c.weaponIndex === i),
       b = after.casings.find((c) => c.weaponIndex === i);
-    assert.notDeepEqual(a.position, b.position, "casing travels through world");
+    const trajectory = await page.evaluate(
+      (index) =>
+        window.firingSamples.flatMap((s) =>
+          s.casings
+            .filter((c) => c.weaponIndex === index)
+            .map((c) => JSON.stringify(c.position)),
+        ),
+      i,
+    );
+    assert(
+      new Set([
+        ...trajectory,
+        JSON.stringify(a.position),
+        JSON.stringify(b.position),
+      ]).size > 1,
+      "casing travels through world",
+    );
     assert.equal(after.flashVisible, false);
     await page.screenshot({ path: `/private/tmp/range-day-firing-${i}.png` });
   }

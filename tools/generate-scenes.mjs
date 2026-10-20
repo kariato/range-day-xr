@@ -1,6 +1,6 @@
 import * as T from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, access } from "node:fs/promises";
 globalThis.FileReader = class {
   readAsArrayBuffer(b) {
     b.arrayBuffer().then((x) => {
@@ -63,6 +63,18 @@ for (const id of [
   "warehouse",
   "qualification",
 ]) {
+  // Keep authored Blender environments when regenerating remaining blockouts.
+  if (
+    await access(new URL(`../assets/${id}.blend`, import.meta.url)).then(
+      () => true,
+      () => false,
+    )
+  ) {
+    console.log(
+      `Keeping authored ${id}.glb; use npm run assets to export its Blender source.`,
+    );
+    continue;
+  }
   const s = new T.Scene();
   s.name = id;
   marker(s, "SPAWN_player", 0, 0, id === "standard" ? 3 : 5);

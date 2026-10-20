@@ -397,9 +397,19 @@ function addTarget(
         }),
   );
   group.add(face);
-  const stand = box(0.05, 1.3, 0.05, 0x354333);
-  stand.position.set(0, -1.1, -0.05);
-  group.add(stand);
+  if (range === "standard" && !steel) {
+    const hanger = box(0.025, 0.69, 0.025, 0x677480);
+    hanger.position.set(0, 0.89, -0.035);
+    const trolley = box(0.26, 0.12, 0.22, 0x344452);
+    trolley.position.set(0, 1.2, -0.035);
+    const clamp = box(0.2, 0.035, 0.045, 0x56616a);
+    clamp.position.set(0, 0.56, 0.015);
+    group.add(hanger, trolley, clamp);
+  } else {
+    const stand = box(0.05, 1.3, 0.05, 0x354333);
+    stand.position.set(0, -1.1, -0.05);
+    group.add(stand);
+  }
   dynamics.add(group);
   const target: Target = {
     group,
@@ -611,7 +621,7 @@ function standardTargets() {
   } else {
     addTarget(targetType, 0, 1.8, -distance);
     for (let lane = -4; lane <= 5; lane++)
-      if (lane) addTarget("paper", lane * 3, 1.8, -15 - Math.abs(lane) * 3);
+      if (lane) addTarget("paper", lane * 1.8, 1.8, -15 - Math.abs(lane) * 3);
   }
 }
 async function start(id: RangeId, flat = true) {
@@ -672,7 +682,7 @@ async function start(id: RangeId, flat = true) {
     if (id === "standard") {
       standardTargets();
       const sign = textBoard("01 / STANDARD RANGE", 4, 0.65);
-      sign.position.set(0, 3.7, -6);
+      sign.position.set(0, 3.5, -2);
       dynamics.add(sign);
     } else if (id === "runthrough") {
       for (const [i, s] of course.stations.entries())
@@ -739,12 +749,12 @@ async function start(id: RangeId, flat = true) {
       if (warehouseMode === "sandbox") breakUntil = Infinity;
     }
     if (id !== "runthrough") {
-      sun.intensity = 2.8;
+      sun.intensity = id === "standard" ? 1.25 : 2.8;
       (
         scene.children.find(
           (c) => c instanceof T.HemisphereLight,
         ) as T.HemisphereLight
-      ).intensity = 2.3;
+      ).intensity = id === "standard" ? 1.8 : 2.3;
     }
     updateControls();
     if (id === "standard") {

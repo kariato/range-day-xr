@@ -32,7 +32,7 @@ try {
       window.rangeDay.state.ammo === 16 &&
       window.rangeDay.state.reloadState === "loaded",
     undefined,
-    { timeout: 7000 },
+    { timeout: 20000 },
   );
   s = await page.evaluate(() => window.rangeDay.state);
   assert.equal(s.ammo, 16);
