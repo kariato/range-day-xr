@@ -27,7 +27,13 @@ try {
   assert(s.hits >= 1, `expected hit: ${JSON.stringify(s)}`);
   assert(s.points > 0);
   await page.keyboard.press("r");
-  await page.waitForTimeout(1750);
+  await page.waitForFunction(
+    () =>
+      window.rangeDay.state.ammo === 15 &&
+      window.rangeDay.state.reloadState === "loaded",
+    undefined,
+    { timeout: 7000 },
+  );
   s = await page.evaluate(() => window.rangeDay.state);
   assert.equal(s.ammo, 15);
   assert.equal(s.reloadState, "loaded");
