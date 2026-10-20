@@ -29,13 +29,13 @@ try {
   await page.keyboard.press("r");
   await page.waitForFunction(
     () =>
-      window.rangeDay.state.ammo === 15 &&
+      window.rangeDay.state.ammo === 16 &&
       window.rangeDay.state.reloadState === "loaded",
     undefined,
     { timeout: 7000 },
   );
   s = await page.evaluate(() => window.rangeDay.state);
-  assert.equal(s.ammo, 15);
+  assert.equal(s.ammo, 16);
   assert.equal(s.reloadState, "loaded");
   await page.screenshot({ path: "/private/tmp/range-day-standard.png" });
   await page.keyboard.press("Enter");
@@ -50,7 +50,11 @@ try {
   assert.equal((await page.evaluate(() => window.rangeDay.state)).targets, 15);
   await page.keyboard.down("w");
   await page.keyboard.down("Shift");
-  await page.waitForTimeout(2600);
+  await page.waitForFunction(
+    () => window.rangeDay.state.stationsActivated >= 1,
+    undefined,
+    { timeout: 10000 },
+  );
   await page.keyboard.up("w");
   await page.keyboard.up("Shift");
   assert.match(await page.locator("#extra").innerText(), /^1/);
@@ -64,7 +68,9 @@ try {
       window.rangeDay?.state.playing &&
       window.rangeDay?.state.range === "warehouse",
   );
-  await page.waitForTimeout(3500);
+  await page.waitForFunction(() => window.rangeDay.state.wave >= 1, undefined, {
+    timeout: 10000,
+  });
   s = await page.evaluate(() => window.rangeDay.state);
   assert.equal(s.wave, 1);
   await page.screenshot({ path: "/private/tmp/range-day-warehouse.png" });

@@ -1,3 +1,7 @@
+import { WeaponModels } from "./weapons/models";
+import { RecoilSpring } from "./weapons/recoil";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { stationReached, finishReached, waypoint } from "./course";
 import "./style.css";
 import * as T from "three";
@@ -20,7 +24,7 @@ const $ = <E extends HTMLElement = HTMLElement>(s: string) =>
   document.querySelector<E>(s)!;
 const app = $("#app");
 const cross = `<svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="13" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="20" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M20 0v11m0 18v11M0 20h11m18 0h11" stroke="currentColor" stroke-width="1.6"/></svg>`;
-app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Explore every range with full 360° movement and looking.<br>Run the outdoor course or clear the new Qualification House.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 04</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough" data-course="basic"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button><button class="card" data-range="runthrough" data-course="qualification"><span class="num">04</span><span class="tag">NEW · 360° CQB</span><h2>QUALIFICATION HOUSE</h2><p>Clear six rooms. Turn every corner. Race the clock.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--accent)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="look-hint" id="look-hint">MOUSE: LOOK 360° · CLICK TO CAPTURE · RIGHT-DRAG OR Q/E TO TURN</div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">15</b> <span>/ <span id="capacity">15</span></span></div><div class="weapon-label" id="weapon-label">P15 · TRAINING PISTOL</div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>Q / E</kbd> TURN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
+app.innerHTML = `<div class="loading" id="loading"><h2>RANGE DAY XR</h2><p>PREPARING THE RANGE</p></div><div class="shell" id="shell"><header><div class="brand">${cross}<div>RANGE DAY <span>XR</span></div></div><nav class="nav"><button class="active" id="ranges-nav">THE RANGES</button><button id="armory-nav">ARMORY</button><button id="scores-nav">RECORDS</button><button id="settings-nav">SETTINGS</button></nav><div class="status"><i class="dot"></i> SYSTEMS READY</div></header><main class="landing"><div class="eyebrow">BROWSER BASED. RANGE READY.</div><h1>MOVE FAST.<br><em>SHOOT CLEAN.</em></h1><p class="intro">Explore every range with full 360° movement and looking.<br>Run the outdoor course or clear the new Qualification House.</p><div class="hero-meta">THE RUN-THROUGH COURSE<strong>MOVE. REACT. REPEAT.</strong>WEBXR · DESKTOP · META QUEST</div><div class="range-title">CHOOSE YOUR RANGE <span>01 — 04</span></div><div class="cards"><button class="card" data-range="standard"><span class="num">01</span><span class="tag">PRECISION</span><h2>STANDARD RANGE</h2><p>Slow down. Line up. Make it count.</p><span class="arrow">↗</span></button><button class="card selected" data-range="runthrough" data-course="basic"><span class="num">02</span><span class="tag">SPEED + ACCURACY</span><h2>RUN-THROUGH</h2><p>Stay moving. Shoot clean. Beat the clock.</p><span class="arrow">↗</span></button><button class="card" data-range="warehouse"><span class="num">03</span><span class="tag">SURVIVAL</span><h2>THE WAREHOUSE</h2><p>They’re closing in. Hold your ground.</p><span class="arrow">↗</span></button><button class="card" data-range="runthrough" data-course="qualification"><span class="num">04</span><span class="tag">NEW · 360° CQB</span><h2>QUALIFICATION HOUSE</h2><p>Clear six rooms. Turn every corner. Race the clock.</p><span class="arrow">↗</span></button></div><div class="launch-row"><button class="primary" id="play">RUN THE POP-UP COURSE <span>↗</span></button><button class="secondary" id="how">HOW TO PLAY</button><div class="launch-note"><b>No download. No waiting.</b><br>Play in your browser or step inside with Quest.</div></div><div class="mobile-warning">Desktop keyboard + mouse or a Quest headset recommended.</div><footer><div class="footer-left"><span>◎ &nbsp; BUILT FOR WEBXR</span><span>↗ &nbsp; META QUEST 2 / 3 / 3S</span><span>▣ &nbsp; DESKTOP READY</span></div><span>FOCUS. BREATHE. REPEAT. &nbsp; / &nbsp; EARLY ACCESS 0.1</span></footer></main><div class="live-pill">POP-UP COURSE PREVIEW &nbsp; ●</div></div><div class="hud hidden" id="hud"><div class="damage" id="damage"></div><div class="vignette" id="vignette"></div><div class="hud-top"><div><div class="hud-brand">RANGE DAY <span style="color:var(--accent)">XR</span></div><div class="hud-label" id="range-label"></div></div><div class="hud-stats"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>ACCURACY</small><strong id="accuracy">—</strong></div><div class="stat"><small>TIME</small><strong id="timer">0.0</strong></div><div class="stat"><small id="extra-label">DISTANCE</small><strong id="extra">15m</strong></div></div></div><div class="range-controls" id="range-controls"></div><div class="crosshair" id="crosshair"></div><div class="hitmark" id="hitmark">×</div><div class="toast" id="toast"></div><div class="course-guide hidden" id="course-guide"></div><div class="look-hint" id="look-hint">MOUSE: LOOK 360° · CLICK TO CAPTURE · RIGHT-DRAG OR Q/E TO TURN</div><div class="hud-bottom"><div><div class="ammo"><b id="ammo">16</b> <span>/ <span id="capacity">16</span></span></div><div class="weapon-label" id="weapon-label">GLOCK 19 GEN5</div><div class="weapon-label" id="weapon-properties"></div><div class="weapon-label" id="reload-label">R TO RELOAD</div></div><div class="controls-strip"><kbd>W A S D</kbd> WALK &nbsp; <kbd>SHIFT</kbd> RUN &nbsp; <kbd>Q / E</kbd> TURN &nbsp; <kbd>R</kbd> RELOAD &nbsp; <kbd>1–3</kbd> WEAPON &nbsp; <kbd>ESC</kbd> PAUSE</div></div><div class="debug hidden" id="debug"></div></div><div id="modal" class="modal-backdrop hidden"></div>`;
 const save = loadSave(),
   world = new World();
 let resultsSummary = "";
@@ -62,7 +66,6 @@ let flashUntil = 0,
   hitUntil = 0,
   damageUntil = 0,
   fireHeld = false,
-  recoil = 0,
   lastGhost = 0,
   ghostSamples: { t: number; x: number; z: number }[] = [],
   paperHits: Hit[] = [],
@@ -107,51 +110,43 @@ const ray = new T.Raycaster(),
   quat = new T.Quaternion(),
   aim = new T.Object3D();
 const gun = new T.Group();
-let flash: T.Mesh, gunBody: T.Group;
+const weaponModels = new WeaponModels(),
+  recoilSpring = new RecoilSpring();
+let muzzleNode: T.Object3D | undefined;
+let gunBody = new T.Group(),
+  weaponParts: Record<string, T.Object3D | undefined> = {};
+const flash = new T.Mesh(
+  new T.ConeGeometry(0.018, 0.065, 8),
+  new T.MeshBasicMaterial({
+    color: 0xffdc99,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  }),
+);
+flash.rotation.x = -Math.PI / 2;
+flash.visible = false;
 function makeGun() {
   gun.clear();
   gunBody = new T.Group();
-  const w = weapon.index;
-  gunBody.add(
-    box(w === 0 ? 0.075 : 0.09, 0.1, w === 0 ? 0.25 : 0.55, 0x26332c),
-  );
-  const grip = box(0.065, 0.16, 0.08, 0x19251e);
-  grip.position.set(0, -0.1, 0.06);
-  grip.rotation.x = -0.2;
-  gunBody.add(grip);
-  const barrel = box(0.028, 0.028, 0.07, 0x78816e);
-  barrel.position.set(0, 0.018, w === 0 ? -0.16 : -0.31);
-  gunBody.add(barrel);
-  for (const z of [w === 0 ? -0.08 : -0.23, 0.08]) {
-    const sight = box(0.012, 0.025, 0.014, 0xc6e979);
-    sight.position.set(0, 0.063, z);
-    gunBody.add(sight);
-  }
-  if (w > 0) {
-    const stock = box(0.06, 0.09, 0.2, 0x344839);
-    stock.position.z = 0.27;
-    gunBody.add(stock);
-    const fore = box(0.07, 0.065, 0.22, 0x46563a);
-    fore.position.set(0, -0.05, -0.15);
-    gunBody.add(fore);
-  }
-  flash = new T.Mesh(
-    new T.ConeGeometry(0.055, 0.18, 6),
-    new T.MeshBasicMaterial({
-      color: 0xffd988,
-      transparent: true,
-      opacity: 0.95,
-    }),
-  );
-  flash.rotation.x = -Math.PI / 2;
-  flash.position.z = w === 0 ? -0.24 : -0.4;
+  const model = weaponModels.clone(weapon.index);
+  gunBody.add(model);
+  weaponParts = {};
+  for (const name of ["Slide", "Magazine", "Pump", "Bolt"])
+    weaponParts[name] = model.getObjectByName(name);
+  const muzzle = WEAPONS[weapon.index].muzzle;
+  muzzleNode = model.getObjectByName("Muzzle");
+  model.updateMatrixWorld(true);
+  if (muzzleNode)
+    flash.position.copy(muzzleNode.getWorldPosition(new T.Vector3()));
+  else flash.position.set(muzzle[0], muzzle[1], muzzle[2]);
+  flash.position.z -= 0.025;
   flash.visible = false;
   gunBody.add(flash);
   gun.add(gunBody);
+  recoilSpring.reset();
+  attachGun();
 }
-makeGun();
-camera.add(gun);
-gun.position.set(0.23, -0.21, -0.4);
 const flashlight = new T.SpotLight(0xeaf4ff, 12, 32, 0.45, 0.6, 1);
 camera.add(flashlight, flashlight.target);
 flashlight.position.set(0.1, -0.1, -0.3);
@@ -337,7 +332,8 @@ function attachGun() {
     if (si >= 0) grips[si].add(wrist);
   } else {
     camera.add(gun);
-    gun.position.set(0.23, -0.21, -0.4);
+    const p = WEAPONS[weapon.index].viewPosition;
+    gun.position.set(p[0], p[1], p[2]);
     gun.rotation.set(0, 0, 0);
   }
 }
@@ -451,11 +447,94 @@ function clearDynamics() {
   dynamics.clear();
   targets.length = dummies.length = decals.length = balls.length = 0;
 }
+let armoryView: {
+  renderer: T.WebGLRenderer;
+  scene: T.Scene;
+  camera: T.PerspectiveCamera;
+  controls: OrbitControls;
+  model?: T.Group;
+  environment?: T.WebGLRenderTarget;
+} | null = null;
+let armoryIndex = 0;
+function destroyArmory() {
+  if (armoryView) {
+    armoryView.controls.dispose();
+    armoryView.environment?.dispose();
+    armoryView.renderer.dispose();
+    armoryView = null;
+  }
+}
+function armory() {
+  showModal(
+    `${modalHead("The armory")}<div class="armory-tabs">${WEAPONS.map((w, i) => `<button class="secondary" data-armory-index="${i}">${i + 1} · ${w.short}</button>`).join("")}</div><canvas class="armory-canvas" id="armory-canvas" aria-label="Interactive 3D weapon preview"></canvas><div id="armory-stats"></div><p class="armory-note">Drag to inspect · scroll to zoom. Capacities and caliber follow manufacturer specifications. Recoil and handling are tuned for gameplay.</p><button class="primary" id="armory-equip">EQUIP THIS WEAPON ↗</button>`,
+  );
+  const canvas = $<HTMLCanvasElement>("#armory-canvas"),
+    r = new T.WebGLRenderer({ canvas, antialias: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  r.setSize(canvas.clientWidth, 300, false);
+  r.toneMapping = T.ACESFilmicToneMapping;
+  r.toneMappingExposure = 1.05;
+  const sc = new T.Scene();
+  sc.background = new T.Color("#10233a");
+  const cam = new T.PerspectiveCamera(38, canvas.clientWidth / 300, 0.005, 15);
+  const controls = new OrbitControls(cam, canvas);
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.6;
+  controls.enableDamping = true;
+  controls.enablePan = false;
+  sc.add(new T.HemisphereLight(0xe9f3ff, 0x334155, 1.8));
+  const key = new T.DirectionalLight(0xffffff, 2);
+  key.position.set(2, 3, -2);
+  sc.add(key);
+  const rim = new T.DirectionalLight(0x89caff, 1.5);
+  rim.position.set(-2, 1, 2);
+  sc.add(rim);
+  const pm = new T.PMREMGenerator(r),
+    room = new RoomEnvironment(),
+    environment = pm.fromScene(room, 0.04);
+  sc.environment = environment.texture;
+  room.dispose();
+  pm.dispose();
+  armoryView = { renderer: r, scene: sc, camera: cam, controls, environment };
+  showArmoryWeapon(weapon.index);
+}
+function showArmoryWeapon(index: number) {
+  if (!armoryView) return;
+  armoryIndex = index;
+  const v = armoryView,
+    w = WEAPONS[index];
+  v.model?.removeFromParent();
+  const model = weaponModels.clone(index),
+    bounds = new T.Box3().setFromObject(model),
+    size = bounds.getSize(new T.Vector3());
+  model.position.sub(bounds.getCenter(new T.Vector3()));
+  v.scene.add(model);
+  v.model = model;
+  const length = Math.max(size.x, size.y, size.z),
+    d = Math.max(0.25, length * 1.05);
+  v.camera.position.set(d, d * 0.25, d * 0.32);
+  v.controls.target.set(0, 0, 0);
+  v.controls.minDistance = length * 0.55;
+  v.controls.maxDistance = length * 4;
+  v.controls.update();
+  $("#armory-stats").innerHTML =
+    `<h3>${w.name}</h3><div class="armory-properties"><div><small>CALIBER</small>${w.caliber}</div><div><small>CAPACITY</small>${w.magazineCapacity} + 1</div><div><small>ACTION</small>${w.action}</div></div><p>${w.recoilLabel}</p><a href="${w.sourceUrl}" target="_blank" rel="noopener noreferrer">Manufacturer specifications ↗</a>`;
+  document
+    .querySelectorAll("[data-armory-index]")
+    .forEach((el) =>
+      el.classList.toggle(
+        "active",
+        Number((el as HTMLElement).dataset.armoryIndex) === index,
+      ),
+    );
+}
 function showModal(html: string) {
+  destroyArmory();
   $("#modal").innerHTML = `<section class="modal">${html}</section>`;
   $("#modal").classList.remove("hidden");
 }
 function closeModal() {
+  destroyArmory();
   $("#modal").classList.add("hidden");
 }
 function modalHead(title: string) {
@@ -583,8 +662,7 @@ async function start(id: RangeId, flat = true) {
     activated.clear();
     finished = false;
     paused = false;
-    weapon.equip(weapon.index);
-    weapon.reserve = id === "standard" ? Infinity : 6;
+    weapon.reset(weapon.index, id === "standard");
     reloadUntil = 0;
     ghostSamples = [];
     lastGhost = 0;
@@ -797,12 +875,18 @@ function spawnDummy(type?: string) {
 function aimRay() {
   scene.updateMatrixWorld(true);
   if (renderer.xr.isPresenting) {
-    gun.getWorldPosition(temp);
-    gun.getWorldQuaternion(quat);
+    (muzzleNode ?? gun).getWorldPosition(temp);
+    gunBody.getWorldQuaternion(quat);
     dir.set(0, 0, -1).applyQuaternion(quat);
     ray.set(temp, dir);
   } else {
     ray.setFromCamera(new T.Vector2(0, 0), camera);
+    const right = new T.Vector3(1, 0, 0).applyQuaternion(
+      camera.getWorldQuaternion(new T.Quaternion()),
+    );
+    ray.ray.direction
+      .applyAxisAngle(right, recoilSpring.pitch * 0.35)
+      .applyAxisAngle(new T.Vector3(0, 1, 0), recoilSpring.yaw * 0.35);
   }
 }
 function fire() {
@@ -820,27 +904,26 @@ function fire() {
   }
   shots++;
   splits.push(elapsed);
-  recoil = WEAPONS[weapon.index].kick;
+  recoilSpring.shot(weapon.index);
   flash.visible = true;
   flashUntil = time + 0.055;
-  haptic(weapon.index === 2 ? 0.9 : 0.35);
-  tone(weapon.index === 2 ? 100 : 180, 0.12, 0.11, "sawtooth");
+  haptic(WEAPONS[weapon.index].haptic);
+  tone(WEAPONS[weapon.index].soundFrequency, 0.12, 0.11, "sawtooth");
   aimRay();
-  const pellets = weapon.index === 2 ? 8 : 1;
+  const pellets = WEAPONS[weapon.index].pellets;
   let shotHit = false;
   for (let p = 0; p < pellets; p++) {
-    const spread =
-      WEAPONS[weapon.index].spread * (weapon.index === 1 && fireHeld ? 1.7 : 1);
+    const spread = WEAPONS[weapon.index].spread + recoilSpring.bloom;
     const r = new T.Raycaster(
       ray.ray.origin.clone(),
       ray.ray.direction
         .clone()
-        .add(
-          new T.Vector3(
-            (Math.random() - 0.5) * spread,
-            (Math.random() - 0.5) * spread,
-            0,
+        .applyAxisAngle(new T.Vector3(0, 1, 0), (Math.random() - 0.5) * spread)
+        .applyAxisAngle(
+          new T.Vector3(1, 0, 0).applyQuaternion(
+            camera.getWorldQuaternion(new T.Quaternion()),
           ),
+          (Math.random() - 0.5) * spread,
         )
         .normalize(),
       0,
@@ -943,6 +1026,8 @@ function fire() {
 }
 function reload() {
   if (!playing || paused || finished || reloadUntil) return;
+  weapon.update(elapsed);
+  if (weapon.state === "cycling") return;
   if (
     weapon.ammo === WEAPONS[weapon.index].capacity &&
     weapon.state === "loaded"
@@ -951,15 +1036,22 @@ function reload() {
   if (range === "standard") weapon.reserve = Infinity;
   if (save.settings.simpleReload) {
     weapon.eject();
-    reloadUntil = elapsed + (weapon.index === 2 ? 0.55 : 1.5);
+    reloadUntil = elapsed + WEAPONS[weapon.index].reloadSeconds;
     toast("RELOADING", 1.5);
     tone(250, 0.12, 0.03);
   } else {
     if (weapon.state === "loaded" || weapon.state === "empty") {
       weapon.eject();
-      toast("MAGAZINE OUT · R TO INSERT");
+      toast(
+        WEAPONS[weapon.index].reloadType === "tube"
+          ? "R TO LOAD ONE SHELL"
+          : "MAGAZINE OUT · R TO INSERT",
+      );
     } else if (weapon.state === "mag-out") {
-      if (weapon.insert()) toast("MAGAZINE IN · R TO CHARGE");
+      if (weapon.insert())
+        toast(
+          weapon.chambered ? "READY · R TO TOP UP" : "LOADED · R TO CHARGE",
+        );
       else toast("NO SPARE MAGAZINES");
     } else {
       weapon.charge();
@@ -1042,7 +1134,7 @@ function pause() {
     return;
   }
   showModal(
-    `${modalHead("Range paused")}<p>Take a breath. Your session is waiting.</p><div class="modal-actions"><button class="primary" id="resume">RESUME ↗</button><button class="secondary" id="hub">BACK TO HUB</button></div>`,
+    `${modalHead("Range paused")}<p>Take a breath. Your session is waiting.</p><div class="modal-actions"><button class="primary" id="resume">RESUME ↗</button><button class="secondary" id="armory-nav">ARMORY</button><button class="secondary" id="hub">BACK TO HUB</button></div>`,
   );
 }
 function resume() {
@@ -1186,8 +1278,7 @@ function updateXR(dt: number) {
     }
     if (a && gunHand) reload();
     if (b && gunHand) {
-      weapon.equip((weapon.index + 1) % 3);
-      makeGun();
+      switchWeapon((weapon.index + 1) % WEAPONS.length);
     }
     if (paused) continue;
     if (!gunHand) {
@@ -1301,7 +1392,10 @@ function updateDummies(dt: number) {
     wave
   ) {
     breakUntil = elapsed + 15;
-    weapon.reserve = Math.min(12, weapon.reserve + 3);
+    weapon.reserve = Math.min(
+      WEAPONS[weapon.index].reloadType === "tube" ? 60 : 12,
+      weapon.reserve + (WEAPONS[weapon.index].reloadType === "tube" ? 12 : 3),
+    );
     health = Math.min(100, health + 25);
     toast("WAVE CLEAR · AMMO RESUPPLIED · 15s", 5);
   }
@@ -1398,6 +1492,7 @@ function frame(now: number) {
   fps = T.MathUtils.lerp(fps, 1 / Math.max(0.001, dt), 0.05);
   if (playing && !paused && !finished && !loading) {
     elapsed += dt;
+    weapon.update(elapsed);
     if (renderer.xr.isPresenting) updateXR(dt);
     else {
       const turn =
@@ -1445,9 +1540,13 @@ function frame(now: number) {
       if (weapon.insert()) {
         weapon.charge();
         haptic(0.15);
-        if (weapon.index === 2 && weapon.ammo < 6 && weapon.reserve > 0) {
+        if (
+          WEAPONS[weapon.index].reloadType === "tube" &&
+          weapon.ammo < WEAPONS[weapon.index].capacity &&
+          weapon.reserve > 0
+        ) {
           weapon.eject();
-          reloadUntil = elapsed + 0.55;
+          reloadUntil = elapsed + WEAPONS[weapon.index].reloadSeconds;
           toast("LOADING SHELLS", 0.6);
         } else toast("READY", 0.6);
       } else toast("NO SPARE MAGAZINES");
@@ -1553,9 +1652,40 @@ function frame(now: number) {
         0.18,
       );
   }
-  recoil = T.MathUtils.lerp(recoil, 0, 0.18);
-  gunBody.rotation.x = recoil * 2;
-  gunBody.position.z = recoil;
+  if (!paused) recoilSpring.update(dt, weapon.index);
+  gunBody.rotation.set(recoilSpring.pitch, recoilSpring.yaw, 0);
+  gunBody.position.z = recoilSpring.back;
+  const config = WEAPONS[weapon.index],
+    sinceShot = elapsed - weapon.lastShot;
+  if (weaponParts.Slide)
+    weaponParts.Slide.position.z = !weapon.chambered
+      ? 0.025
+      : Math.max(0, 1 - sinceShot / config.cycleSeconds) * 0.025;
+  if (weaponParts.Bolt)
+    weaponParts.Bolt.position.z =
+      Math.max(0, 1 - sinceShot / config.cycleSeconds) * 0.03;
+  if (weaponParts.Pump) {
+    const progress = T.MathUtils.clamp(sinceShot / config.cycleSeconds, 0, 1);
+    weaponParts.Pump.position.z = Math.sin(progress * Math.PI) * 0.065;
+  }
+  if (weaponParts.Magazine) {
+    const out = weapon.state === "mag-out";
+    weaponParts.Magazine.visible = !out;
+    if (reloadUntil) {
+      const p =
+        1 -
+        T.MathUtils.clamp((reloadUntil - elapsed) / config.reloadSeconds, 0, 1);
+      weaponParts.Magazine.visible = p < 0.25 || p > 0.72;
+      weaponParts.Magazine.position.y =
+        p < 0.25
+          ? (-p / 0.25) * 0.18
+          : p > 0.72
+            ? (-(1 - p) / 0.28) * 0.18
+            : -0.18;
+      gunBody.rotation.z = -Math.sin(p * Math.PI) * 0.15;
+    } else weaponParts.Magazine.position.y = 0;
+  }
+
   if (time > flashUntil) flash.visible = false;
   if (time > toastUntil) $("#toast").textContent = "";
   if (time > hitUntil) $("#hitmark").style.opacity = "0";
@@ -1579,15 +1709,16 @@ function frame(now: number) {
         : range === "runthrough"
           ? `${activated.size} / ${course.stations.length}`
           : `${distance}m`;
-    $("#weapon-label").textContent =
-      `${WEAPONS[weapon.index].short} · ${WEAPONS[weapon.index].name.toUpperCase()}`;
+    $("#weapon-label").textContent = WEAPONS[weapon.index].name.toUpperCase();
+    $("#weapon-properties").textContent =
+      `${config.caliber} · ${config.action.toUpperCase()} · ${weapon.magazine} ${config.reloadType === "tube" ? "IN TUBE" : "IN MAG"} + ${Number(weapon.chambered)} CHAMBERED`;
     $("#reload-label").textContent = reloadUntil
       ? "RELOADING…"
       : weapon.state === "mag-out"
         ? "MAG OUT · INSERT MAG"
         : weapon.state === "mag-in"
           ? "RACK SLIDE TO CHARGE"
-          : `${Number.isFinite(weapon.reserve) ? weapon.reserve : "∞"} SPARE MAGS · R TO RELOAD`;
+          : `${Number.isFinite(weapon.reserve) ? weapon.reserve : "∞"} SPARE ${config.reloadType === "tube" ? "SHELLS" : "MAGS"} · R TO RELOAD`;
     if (renderer.xr.isPresenting) updateWrist();
     if (debug)
       $("#debug").textContent =
@@ -1603,6 +1734,10 @@ function frame(now: number) {
   );
   $("#crosshair").classList.toggle("hidden", renderer.xr.isPresenting);
   ghost.visible = ghost.visible && playing && range === "runthrough";
+  if (armoryView) {
+    armoryView.controls.update();
+    armoryView.renderer.render(armoryView.scene, armoryView.camera);
+  }
   renderer.render(scene, camera);
 }
 function updateWrist() {
@@ -1632,6 +1767,7 @@ function updateWrist() {
 }
 function switchWeapon(i: number) {
   if (!playing || paused) return;
+  weapon.update(elapsed);
   weapon.equip(i);
   reloadUntil = 0;
   makeGun();
@@ -1736,6 +1872,19 @@ document.addEventListener("change", (e) => {
 document.addEventListener("click", (e) => {
   const el = (e.target as HTMLElement).closest("button")!;
   if (!el) return;
+  if (el.dataset.armoryIndex) {
+    showArmoryWeapon(Number(el.dataset.armoryIndex));
+    return;
+  }
+  if (el.id === "armory-equip") {
+    weapon.update(elapsed);
+    weapon.equip(armoryIndex);
+    reloadUntil = 0;
+    makeGun();
+    closeModal();
+    if (playing && !finished) resume();
+    return;
+  }
   if (el.dataset.range) {
     selected = el.dataset.range as RangeId;
     if (el.dataset.course) courseName = el.dataset.course;
@@ -1769,6 +1918,9 @@ document.addEventListener("click", (e) => {
       break;
     case "how":
       howTo();
+      break;
+    case "armory-nav":
+      armory();
       break;
     case "scores-nav":
       records();
@@ -1843,7 +1995,14 @@ renderer.xr.addEventListener("sessionend", () => {
 });
 async function init() {
   try {
-    await world.init(renderer);
+    await Promise.all([world.init(renderer), weaponModels.load()]);
+    const studio = new RoomEnvironment();
+    const pmrem = new T.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(studio, 0.04).texture;
+    scene.environmentIntensity = 0.45;
+    studio.dispose();
+    pmrem.dispose();
+    makeGun();
     await coursePreview();
     gun.visible = false;
     if (
@@ -1896,6 +2055,13 @@ async function init() {
           triangles: renderer.info.render.triangles,
           modelLoaded: world.root.children.length > 0,
           ammo: weapon.ammo,
+          magazine: weapon.magazine,
+          chambered: weapon.chambered,
+          weaponIndex: weapon.index,
+          weaponId: WEAPONS[weapon.index].id,
+          weaponModelsLoaded: weaponModels.loaded,
+          recoilPitch: recoilSpring.pitch,
+          recoilBack: recoilSpring.back,
           reloadState: weapon.state,
         };
       },

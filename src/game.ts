@@ -1,51 +1,116 @@
 export type RangeId = "standard" | "runthrough" | "warehouse";
-export type ReloadState = "loaded" | "empty" | "mag-out" | "mag-in";
+export type ReloadState = "loaded" | "empty" | "mag-out" | "mag-in" | "cycling";
 import configs from "./weapons/configs.json";
 export const WEAPONS = configs;
+interface WeaponSnapshot {
+  magazine: number;
+  chambered: boolean;
+  reserve: number;
+  state: ReloadState;
+}
 export class WeaponState {
   index = 0;
-  ammo = 15;
+  magazine = WEAPONS[0].magazineCapacity;
+  chambered = true;
   reserve = 6;
   state: ReloadState = "loaded";
   lastShot = -Infinity;
-  equip(index: number) {
+  cycleUntil = 0;
+  unlimited = false;
+  private loadouts = new Map<number, WeaponSnapshot>();
+  get ammo() {
+    return this.magazine + Number(this.chambered);
+  }
+  reset(index = this.index, unlimited = false) {
+    this.loadouts.clear();
+    this.unlimited = unlimited;
     this.index = index;
-    this.ammo = WEAPONS[index].capacity;
+    this.fresh();
+  }
+  private fresh() {
+    const w = WEAPONS[this.index];
+    this.magazine = w.magazineCapacity;
+    this.chambered = true;
+    this.reserve = this.unlimited ? Infinity : w.reloadType === "tube" ? 36 : 6;
     this.state = "loaded";
     this.lastShot = -Infinity;
+    this.cycleUntil = 0;
+  }
+  equip(index: number) {
+    if (!WEAPONS[index]) throw new RangeError("Unknown weapon");
+    if (index === this.index) return;
+    this.loadouts.set(this.index, {
+      magazine: this.magazine,
+      chambered: this.chambered,
+      reserve: this.reserve,
+      state: this.state === "cycling" ? "loaded" : this.state,
+    });
+    this.index = index;
+    const saved = this.loadouts.get(index);
+    if (saved) Object.assign(this, saved);
+    else this.fresh();
+    this.lastShot = -Infinity;
+    this.cycleUntil = 0;
+    if (!this.chambered && this.magazine > 0 && this.state === "loaded") {
+      this.magazine--;
+      this.chambered = true;
+    }
+  }
+  update(time: number) {
+    if (this.state === "cycling" && time >= this.cycleUntil) {
+      if (this.magazine > 0) {
+        this.magazine--;
+        this.chambered = true;
+        this.state = "loaded";
+      } else this.state = "empty";
+    }
   }
   fire(time: number) {
+    this.update(time);
+    const w = WEAPONS[this.index];
     if (
       this.state !== "loaded" ||
-      this.ammo === 0 ||
-      time - this.lastShot < WEAPONS[this.index].interval
+      !this.chambered ||
+      time - this.lastShot < w.interval
     )
       return false;
     this.lastShot = time;
-    this.ammo--;
-    if (!this.ammo) this.state = "empty";
+    this.chambered = false;
+    if (w.reloadType === "tube") {
+      this.cycleUntil = time + w.cycleSeconds;
+      this.state = this.magazine > 0 ? "cycling" : "empty";
+    } else if (this.magazine > 0) {
+      this.magazine--;
+      this.chambered = true;
+    } else this.state = "empty";
     return true;
   }
   eject() {
-    if (this.state === "loaded" || this.state === "empty")
-      this.state = "mag-out";
+    if (this.state !== "loaded" && this.state !== "empty") return false;
+    if (WEAPONS[this.index].reloadType === "magazine") this.magazine = 0;
+    this.state = "mag-out";
+    return true;
   }
   insert() {
     if (this.state !== "mag-out" || this.reserve === 0) return false;
+    const w = WEAPONS[this.index];
+    if (w.reloadType === "tube" && this.magazine >= w.magazineCapacity)
+      return false;
     this.reserve--;
-    this.ammo =
-      this.index === 2
-        ? Math.min(6, this.ammo + 1)
-        : WEAPONS[this.index].capacity;
-    this.state = "mag-in";
+    this.magazine =
+      w.reloadType === "tube" ? this.magazine + 1 : w.magazineCapacity;
+    this.state = this.chambered ? "loaded" : "mag-in";
     return true;
   }
   charge() {
-    if (this.state === "mag-in") {
-      this.state = "loaded";
-      return true;
+    if (this.state === "loaded") return true;
+    if (this.state !== "mag-in") return false;
+    if (!this.chambered && this.magazine > 0) {
+      this.magazine--;
+      this.chambered = true;
     }
-    return false;
+    this.state = this.chambered ? "loaded" : "empty";
+    return this.chambered;
   }
 }
 export function paperScore(x: number, y: number, radius = 0.55) {

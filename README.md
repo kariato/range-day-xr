@@ -25,10 +25,16 @@ For a Quest on the same network: `HTTPS=1 npm run dev`, open the printed LAN URL
 - Standard range: 10 lanes, paper bullseyes, zone targets and falling steel, distances 5–50m, bring-back inspection, up to 48 persistent bullet marks, free fire, 5-shot group, 6-shot string and randomized reaction drills. Exact smallest enclosing circle for group diameter.
 - Run-through: three outdoor JSON-driven five-station courses plus the six-room Qualification House, timed blue/white pop-ups, moving targets and steel-activated swingers in Cover Drill, hit zones, no-shoot and miss penalties, hit factor, saved Basic Lane ghost, and a flashlight for Night Run. Walk across the finish gate to end a run.
 - Warehouse: navmesh pursuit around racks, walkers, rushers, shooters with visible foam projectiles, frontal shield blocking, 12-enemy cap, 10Hz path updates, health regeneration, endless waves/resupply, fixed building clear and sandbox modes.
-- Shared pistol, automatic carbine, shotgun pellet spread, recoil, haptics, reload state machine with magazine reserves, synth audio, local records/medals and settings.
+- Blender-authored Glock 19 Gen5 (15+1), S&W M&P15 Sport III (30+1 semi-auto), and Mossberg 590R (6+1 pump), with a 3D Armory viewer, separate chamber/magazine counts, weapon-specific spring recoil and recovery, cycling parts, haptics and reload timings. Switching preserves ammunition. Shotgun reloads one shell at a time. Synthetic audio, local records/medals and settings.
 - WebXR: controller models, handedness, two-handed aiming, support-stick locomotion or teleport, 30-degree snap or smooth turning, wrist stats, menu pointing, manual magazine grip/slide interaction or simple reload.
 - Desktop pause, mouse look, sprint, crouch, debug stats and free camera. All ranges and weapons are available immediately in early access; medals record progression without restricting testing.
 - GLB scene cache, static geometry batching, Rapier world occlusion/collision, warehouse navmesh, Blender export pipeline, CI build and Pages deployment.
+
+## Weapons and Armory
+
+Open **Armory** from the home navigation to rotate/zoom the three Blender models and equip one. During a run use **1–3** or the mouse wheel; on Quest use gun-hand B/Y. The HUD shows caliber, action, magazine/tube rounds, chambered round and reserves. An empty-mag reload may leave one fewer round than maximum capacity because charging feeds from the magazine; a retained-chamber reload fills to capacity.
+
+See [weapon sources and verified references](assets/weapons/README.md) for `.blend` files, manufacturer links, editing/exporting and the boundary between sourced specs and game recoil tuning. `npm run assets:weapons` exports edited sources; `npm run assets:weapons:generate` explicitly rebuilds originals. Normal builds use the included GLBs without needing Blender.
 
 ## Controls
 
@@ -60,7 +66,7 @@ Click the scene if the browser releases pointer lock. Esc releases the mouse and
 
 ## Current limits versus the complete design
 
-This is an early-access implementation, not the final six-milestone art/performance release. Environments and weapons are geometric blockouts, not authored Blender scenes with baked lighting, rigged dummy animations or compressed texture art. Audio is synthesized rather than positional asset recordings. The warehouse uses a single level of racks/dock cover; office, stairs and catwalk remain for the environment pass. Steel uses visual fall/reset rather than rigid-body plate simulation. Rail retrieval snaps to inspection distance. Attachments, the guided tutorial, 3D hub-door transitions, physical in-world range-control panels, rigged hit/down animations remain. VR includes a world-space range control menu and result summary; its layout still needs headset usability testing. Settings/records are local to the browser. No multiplayer, passthrough or online leaderboard.
+This is an early-access implementation, not the final six-milestone art/performance release. Environments are geometric blockouts, without the planned Blender art pass, baked lighting, rigged dummy animations or compressed texture art. Weapons are original exterior Blender models, with editable `.blend` sources and GLB exports; their visible proportions are artist interpretations rather than manufacturer CAD. Audio is synthesized rather than positional asset recordings. The warehouse uses a single level of racks/dock cover; office, stairs and catwalk remain for the environment pass. Steel uses visual fall/reset rather than rigid-body plate simulation. Rail retrieval snaps to inspection distance. Attachments, the guided tutorial, 3D hub-door transitions, physical in-world range-control panels, rigged hit/down animations remain. VR includes a world-space range control menu and result summary; its layout still needs headset usability testing. Settings/records are local to the browser. No multiplayer, passthrough or online leaderboard.
 
 Real Quest testing is required for hand alignment, comfort, room-scale boundary behavior and sustained 72Hz performance. Software-browser draw-call checks are not headset certification. Controller models load from the three.js controller asset service; font files load from Google Fonts with local fallbacks.
 
@@ -69,3 +75,5 @@ Real Quest testing is required for hand alignment, comfort, room-scale boundary 
 `.github/workflows/pages.yml` builds/tests on pushes to `main`, then uploads/deploys `dist`. In repository Settings → Pages use **GitHub Actions**. Vite uses a relative base so both project URLs and custom domains work. Repository visibility must permit Pages on your account plan.
 
 `npm run test:qualification` verifies walking beyond the original booth, a full keyboard 360-degree turn, six-room circuit navigation, sideways targets, wall collisions, spatial triggers, and returning to the timed finish. Set `TEST_URL` to the dev server or public URL.
+
+`npm run test:weapons` browser-checks all three GLBs and Armory previews, chambered capacities, semi-auto triggers, recoil movement, loadout persistence and magazine/tube reloads. The unit suite additionally checks frame-rate-independent recoil, pump cycling and empty/tactical chamber behavior.
